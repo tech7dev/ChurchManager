@@ -1,0 +1,54 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: churchms-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "ChurchMS@Dev2024!"
+      MSSQL_COLLATION: "Latin1_General_100_CI_AS_SC_UTF8"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: churchms-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  seq:
+    image: datalust/seq:latest
+    container_name: churchms-seq
+    environment:
+      ACCEPT_EULA: "Y"
+    ports:
+      - "5341:5341"
+      - "8081:80"
+    volumes:
+      - seq-data:/data
+    restart: unless-stopped
+
+  minio:
+    image: minio/minio:latest
+    container_name: churchms-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: "churchms"
+      MINIO_ROOT_PASSWORD: "ChurchMS@Dev2024!"
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio-data:/data
+    restart: unless-stopped
+
+volumes:
+  sqlserver-data:
+  redis-data:
+  seq-data:
+  minio-data:

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Shell
+    x:Class="ChurchMS.MAUI.AppShell"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:views="clr-namespace:ChurchMS.MAUI.Views"
+    Title="ChurchMS"
+    Shell.NavBarIsVisible="True"
+    Shell.TabBarIsVisible="True">
+
+    <!-- Login (no tab bar) -->
+    <ShellContent
+        Route="login"
+        ContentTemplate="{DataTemplate views:LoginPage}"
+        Shell.TabBarIsVisible="False"
+        Shell.NavBarIsVisible="False" />
+
+    <!-- Main tabs -->
+    <TabBar Route="main">
+        <Tab Title="Dashboard" Icon="home.png">
+            <ShellContent Route="dashboard"
+                          ContentTemplate="{DataTemplate views:DashboardPage}" />
+        </Tab>
+        <Tab Title="Members" Icon="people.png">
+            <ShellContent Route="members"
+                          ContentTemplate="{DataTemplate views:MembersPage}" />
+        </Tab>
+        <Tab Title="Giving" Icon="giving.png">
+            <ShellContent Route="giving"
+                          ContentTemplate="{DataTemplate views:GivingPage}" />
+        </Tab>
+        <Tab Title="Events" Icon="events.png">
+            <ShellContent Route="events"
+                          ContentTemplate="{DataTemplate views:EventsPage}" />
+        </Tab>
+    </TabBar>
+
+</Shell>

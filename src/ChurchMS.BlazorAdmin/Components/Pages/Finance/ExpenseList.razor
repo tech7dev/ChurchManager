@@ -1,0 +1,74 @@
+@page "/expenses"
+@attribute [Authorize]
+@inject FinanceService FinanceService
+@inject NavigationManager Navigation
+
+<PageTitle>Expenses — ChurchMS</PageTitle>
+
+<div class="d-flex align-center justify-space-between mb-4">
+    <MudText Typo="Typo.h4">Expenses</MudText>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.Add"
+               Href="/expenses/new">Submit Expense</MudButton>
+</div>
+
+<MudTable ServerData="@ServerLoad" Dense="true" Hover="true" @ref="_table"
+          RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Primary">
+    <HeaderContent>
+        <MudTh>Title</MudTh>
+        <MudTh>Category</MudTh>
+        <MudTh>Date</MudTh>
+        <MudTh>Vendor</MudTh>
+        <MudTh>Amount</MudTh>
+        <MudTh>Status</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Title">@context.Title</MudTd>
+        <MudTd DataLabel="Category">@(context.CategoryName ?? "—")</MudTd>
+        <MudTd DataLabel="Date">@context.ExpenseDate.ToString("d")</MudTd>
+        <MudTd DataLabel="Vendor">@(context.VendorName ?? "—")</MudTd>
+        <MudTd DataLabel="Amount">
+            <MudText Style="font-weight:600">@context.Amount.ToString("N2") @context.Currency</MudText>
+        </MudTd>
+        <MudTd DataLabel="Status">
+            <MudChip T="string" Size="Size.Small" Color="@ExpenseStatusColor(context.Status)" Label="true">
+                @context.Status
+            </MudChip>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText Align="Align.Center" Class="pa-4">No expenses found.</MudText>
+    </NoRecordsContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<ExpenseListItemDto> _table = null!;
+    private bool _loading;
+
+    private async Task<TableData<ExpenseListItemDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await FinanceService.GetExpensesAsync(state.Page + 1, state.PageSize);
+            return new TableData<ExpenseListItemDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+
+    private static Color ExpenseStatusColor(string status) => status switch
+    {
+        "Approved" => Color.Success,
+        "Pending" => Color.Warning,
+        "Rejected" => Color.Error,
+        "Paid" => Color.Info,
+        _ => Color.Default
+    };
+}

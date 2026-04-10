@@ -1,0 +1,134 @@
+@page "/"
+@attribute [Authorize]
+@inject ReportService ReportService
+@inject ISnackbar Snackbar
+
+<PageTitle>Dashboard — ChurchMS</PageTitle>
+
+<MudText Typo="Typo.h4" GutterBottom="true">Dashboard</MudText>
+<MudText Typo="Typo.body1" Color="Color.Secondary" Class="mb-6">
+    Church overview at a glance
+</MudText>
+
+@if (_loading)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mb-4" />
+}
+
+@if (_data is not null)
+{
+    <!-- Members & People -->
+    <MudText Typo="Typo.subtitle1" Class="mb-2 mt-2">People</MudText>
+    <MudGrid Spacing="3" Class="mb-4">
+        <MudItem xs="12" sm="6" md="3">
+            <StatCard Title="Total Members" Value="@_data.TotalMembers.ToString("N0")"
+                      SubTitle="@($"{_data.ActiveMembers:N0} active")"
+                      Icon="@Icons.Material.Filled.People" Color="Color.Primary" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <StatCard Title="New This Month" Value="@_data.NewMembersThisMonth.ToString("N0")"
+                      SubTitle="New members"
+                      Icon="@Icons.Material.Filled.PersonAdd" Color="Color.Success" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <StatCard Title="Families" Value="@_data.TotalFamilies.ToString("N0")"
+                      SubTitle="Registered families"
+                      Icon="@Icons.Material.Filled.FamilyRestroom" Color="Color.Info" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="3">
+            <StatCard Title="Visitors" Value="@_data.TotalVisitors.ToString("N0")"
+                      SubTitle="Total visitors"
+                      Icon="@Icons.Material.Filled.PersonSearch" Color="Color.Warning" />
+        </MudItem>
+    </MudGrid>
+
+    <!-- Finance -->
+    <MudText Typo="Typo.subtitle1" Class="mb-2">Finance</MudText>
+    <MudGrid Spacing="3" Class="mb-4">
+        <MudItem xs="12" sm="6" md="4">
+            <StatCard Title="Contributions (Month)" Value="@_data.ContributionsThisMonth.ToString("N2")"
+                      SubTitle="@($"Year: {_data.ContributionsThisYear:N2}")"
+                      Icon="@Icons.Material.Filled.Payments" Color="Color.Success" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <StatCard Title="Expenses (Month)" Value="@_data.ExpensesThisMonth.ToString("N2")"
+                      SubTitle="Current month expenses"
+                      Icon="@Icons.Material.Filled.Receipt" Color="Color.Error" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <StatCard Title="Departments" Value="@_data.TotalDepartments.ToString("N0")"
+                      SubTitle="Active departments"
+                      Icon="@Icons.Material.Filled.Groups" Color="Color.Secondary" />
+        </MudItem>
+    </MudGrid>
+
+    <!-- Events -->
+    <MudText Typo="Typo.subtitle1" Class="mb-2">Events</MudText>
+    <MudGrid Spacing="3" Class="mb-4">
+        <MudItem xs="12" sm="6" md="4">
+            <StatCard Title="Upcoming Events" Value="@_data.UpcomingEventsCount.ToString("N0")"
+                      SubTitle="@($"{_data.EventsThisMonth} this month")"
+                      Icon="@Icons.Material.Filled.Event" Color="Color.Info" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <StatCard Title="SMS Credits" Value="@_data.SmsCreditBalance.ToString("N0")"
+                      SubTitle="Available credits"
+                      Icon="@Icons.Material.Filled.Sms" Color="Color.Primary" />
+        </MudItem>
+        <MudItem xs="12" sm="6" md="4">
+            <StatCard Title="Open Tickets" Value="@_data.OpenSupportTickets.ToString("N0")"
+                      SubTitle="Support tickets pending"
+                      Icon="@Icons.Material.Filled.ConfirmationNumber" Color="Color.Warning" />
+        </MudItem>
+    </MudGrid>
+
+    <!-- Subscription status -->
+    <MudGrid Spacing="3">
+        <MudItem xs="12">
+            <MudCard Elevation="2">
+                <MudCardContent Class="d-flex align-center gap-3">
+                    <MudIcon Icon="@(_data.HasActiveSubscription
+                                    ? Icons.Material.Filled.CheckCircle
+                                    : Icons.Material.Filled.Error)"
+                             Color="@(_data.HasActiveSubscription ? Color.Success : Color.Error)"
+                             Size="Size.Large" />
+                    <div>
+                        <MudText Typo="Typo.subtitle1">Subscription Status</MudText>
+                        <MudText Typo="Typo.body2" Color="Color.Secondary">
+                            @(_data.HasActiveSubscription
+                                ? $"Active — Plan: {_data.ActiveSubscriptionPlan}"
+                                : "No active subscription. Please renew to continue using all features.")
+                        </MudText>
+                    </div>
+                    @if (!_data.HasActiveSubscription)
+                    {
+                        <MudSpacer />
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                                   Href="/subscriptions">Manage Subscription</MudButton>
+                    }
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    private DashboardSummaryDto? _data;
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _data = await ReportService.GetDashboardAsync();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Failed to load dashboard: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}

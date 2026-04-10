@@ -1,0 +1,141 @@
+@page "/reports/members"
+@attribute [Authorize]
+@inject ReportService ReportService
+@inject ISnackbar Snackbar
+
+<PageTitle>Member Report — ChurchMS</PageTitle>
+
+<MudText Typo="Typo.h4" GutterBottom="true">Member Report</MudText>
+
+@if (_loading)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mb-4" />
+}
+
+@if (_data is not null)
+{
+    <MudGrid Spacing="3" Class="mb-4">
+        <MudItem xs="6" sm="3">
+            <StatCard Title="Total" Value="@_data.Total.ToString("N0")"
+                      Icon="@Icons.Material.Filled.People" Color="Color.Primary" />
+        </MudItem>
+        <MudItem xs="6" sm="3">
+            <StatCard Title="Active" Value="@_data.Active.ToString("N0")"
+                      Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success" />
+        </MudItem>
+        <MudItem xs="6" sm="3">
+            <StatCard Title="Inactive" Value="@_data.Inactive.ToString("N0")"
+                      Icon="@Icons.Material.Filled.PauseCircle" Color="Color.Warning" />
+        </MudItem>
+        <MudItem xs="6" sm="3">
+            <StatCard Title="Transferred" Value="@_data.Transferred.ToString("N0")"
+                      Icon="@Icons.Material.Filled.TransferWithinAStation" Color="Color.Info" />
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Spacing="3">
+        <!-- Gender -->
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <CardHeaderContent><MudText Typo="Typo.subtitle1">By Gender</MudText></CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent Class="pa-0">
+                    <MudSimpleTable Dense="true">
+                        <thead><tr><th>Gender</th><th>Count</th></tr></thead>
+                        <tbody>
+                            @foreach (var g in _data.ByGender)
+                            {
+                                <tr><td>@g.Gender</td><td><strong>@g.Count</strong></td></tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Age Groups -->
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <CardHeaderContent><MudText Typo="Typo.subtitle1">By Age Group</MudText></CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent Class="pa-0">
+                    <MudSimpleTable Dense="true">
+                        <thead><tr><th>Age Group</th><th>Count</th></tr></thead>
+                        <tbody>
+                            @foreach (var a in _data.ByAgeGroup)
+                            {
+                                <tr><td>@a.Label</td><td><strong>@a.Count</strong></td></tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Marital Status -->
+        <MudItem xs="12" sm="6" md="4">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <CardHeaderContent><MudText Typo="Typo.subtitle1">By Marital Status</MudText></CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent Class="pa-0">
+                    <MudSimpleTable Dense="true">
+                        <thead><tr><th>Status</th><th>Count</th></tr></thead>
+                        <tbody>
+                            @foreach (var m in _data.ByMaritalStatus)
+                            {
+                                <tr><td>@m.Status</td><td><strong>@m.Count</strong></td></tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Monthly Growth -->
+        <MudItem xs="12">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <CardHeaderContent><MudText Typo="Typo.subtitle1">Monthly Growth</MudText></CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent Class="pa-0">
+                    <MudSimpleTable Dense="true" Hover="true">
+                        <thead>
+                            <tr><th>Month</th><th>New Members</th><th>Cumulative Total</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var m in _data.MonthlyGrowth)
+                            {
+                                <tr>
+                                    <td>@m.MonthLabel</td>
+                                    <td>@m.NewMembers</td>
+                                    <td><strong>@m.CumulativeTotal</strong></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    private MemberReportDto? _data;
+    private bool _loading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _data = await ReportService.GetMemberReportAsync(12);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+        finally { _loading = false; }
+    }
+}

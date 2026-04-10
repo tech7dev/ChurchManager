@@ -1,0 +1,180 @@
+@page "/reports/financial"
+@attribute [Authorize]
+@inject ReportService ReportService
+@inject ISnackbar Snackbar
+
+<PageTitle>Financial Report — ChurchMS</PageTitle>
+
+<MudText Typo="Typo.h4" GutterBottom="true">Financial Report</MudText>
+
+<!-- Date range filter -->
+<MudPaper Class="mb-4 pa-4" Elevation="1">
+    <MudGrid AlignItems="AlignItems.End">
+        <MudItem xs="12" sm="4">
+            <MudDatePicker Label="From" @bind-Date="_from" DateFormat="yyyy-MM-dd" />
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudDatePicker Label="To" @bind-Date="_to" DateFormat="yyyy-MM-dd" />
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Search"
+                       OnClick="@Load" Disabled="@_loading" FullWidth="true">
+                Generate Report
+            </MudButton>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+@if (_loading)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mb-4" />
+}
+
+@if (_data is not null)
+{
+    <!-- Summary KPIs -->
+    <MudGrid Spacing="3" Class="mb-4">
+        <MudItem xs="12" sm="4">
+            <StatCard Title="Total Contributions" Value="@_data.TotalContributions.ToString("N2")"
+                      SubTitle="@_data.Currency" Icon="@Icons.Material.Filled.Payments" Color="Color.Success" />
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <StatCard Title="Total Expenses" Value="@_data.TotalExpenses.ToString("N2")"
+                      SubTitle="@_data.Currency" Icon="@Icons.Material.Filled.Receipt" Color="Color.Error" />
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <StatCard Title="Net Income" Value="@_data.NetIncome.ToString("N2")"
+                      SubTitle="@_data.Currency"
+                      Icon="@Icons.Material.Filled.AccountBalance"
+                      Color="@(_data.NetIncome >= 0 ? Color.Success : Color.Error)" />
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Spacing="3">
+        <!-- Contributions by Fund -->
+        <MudItem xs="12" md="6">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.subtitle1">Contributions by Fund</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent Class="pa-0">
+                    <MudSimpleTable Dense="true" Hover="true">
+                        <thead>
+                            <tr>
+                                <th>Fund</th>
+                                <th>Count</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var fund in _data.ByFund)
+                            {
+                                <tr>
+                                    <td>@fund.FundName</td>
+                                    <td>@fund.Count</td>
+                                    <td><strong>@fund.Total.ToString("N2")</strong></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Expenses by Category -->
+        <MudItem xs="12" md="6">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.subtitle1">Expenses by Category</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent Class="pa-0">
+                    <MudSimpleTable Dense="true" Hover="true">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Count</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var cat in _data.ExpensesByCategory)
+                            {
+                                <tr>
+                                    <td>@cat.Category</td>
+                                    <td>@cat.Count</td>
+                                    <td><strong>@cat.Total.ToString("N2")</strong></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <!-- Monthly Trend -->
+        <MudItem xs="12">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.subtitle1">Monthly Trend</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent Class="pa-0">
+                    <MudSimpleTable Dense="true" Hover="true">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Contributions</th>
+                                <th>Expenses</th>
+                                <th>Net</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var m in _data.MonthlyContributionTrend)
+                            {
+                                var net = m.Contributions - m.Expenses;
+                                <tr>
+                                    <td>@m.MonthLabel</td>
+                                    <td>@m.Contributions.ToString("N2")</td>
+                                    <td>@m.Expenses.ToString("N2")</td>
+                                    <td style="color:@(net >= 0 ? "green" : "red"); font-weight:600">
+                                        @net.ToString("N2")
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    private DateTime? _from = DateTime.UtcNow.AddMonths(-6);
+    private DateTime? _to = DateTime.UtcNow;
+    private FinancialSummaryDto? _data;
+    private bool _loading;
+
+    protected override async Task OnInitializedAsync() => await Load();
+
+    private async Task Load()
+    {
+        if (_from is null || _to is null) return;
+        _loading = true;
+        try
+        {
+            _data = await ReportService.GetFinancialSummaryAsync(_from.Value, _to.Value);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading report: {ex.Message}", Severity.Error);
+        }
+        finally { _loading = false; }
+    }
+}

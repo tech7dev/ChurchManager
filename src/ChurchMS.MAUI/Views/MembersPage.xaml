@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ChurchMS.MAUI.ViewModels"
+             xmlns:models="clr-namespace:ChurchMS.MAUI.Models"
+             x:Class="ChurchMS.MAUI.Views.MembersPage"
+             x:DataType="vm:MembersViewModel"
+             Title="{Binding Title}"
+             BackgroundColor="#F5F5F5">
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- Search Bar -->
+        <SearchBar Grid.Row="0" Text="{Binding SearchText}"
+                   Placeholder="Search members..."
+                   BackgroundColor="White" Margin="8"
+                   SearchCommand="{Binding RefreshCommand}" />
+
+        <!-- Member List -->
+        <RefreshView Grid.Row="1" Command="{Binding RefreshCommand}"
+                     IsRefreshing="{Binding IsBusy}">
+            <CollectionView ItemsSource="{Binding FilteredMembers}"
+                            SelectionMode="None"
+                            EmptyView="No members found.">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:LocalMember">
+                        <SwipeView>
+                            <Frame Margin="8,4" Padding="12" CornerRadius="10"
+                                   BackgroundColor="White" HasShadow="False">
+                                <Grid ColumnDefinitions="48,*">
+                                    <!-- Avatar -->
+                                    <Frame Grid.Column="0" CornerRadius="24"
+                                           BackgroundColor="#1565C0" Padding="0"
+                                           WidthRequest="48" HeightRequest="48"
+                                           HorizontalOptions="Center" VerticalOptions="Center">
+                                        <Label Text="{Binding FirstName[0]}"
+                                               TextColor="White" FontSize="20"
+                                               FontAttributes="Bold"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center" />
+                                    </Frame>
+
+                                    <!-- Info -->
+                                    <VerticalStackLayout Grid.Column="1" Padding="12,0,0,0" Spacing="2">
+                                        <Label Text="{Binding FullName}"
+                                               FontAttributes="Bold" FontSize="15" />
+                                        <Label Text="{Binding MembershipNumber}"
+                                               FontSize="12" TextColor="#1565C0" />
+                                        <Label Text="{Binding Phone}"
+                                               FontSize="12" TextColor="#666" />
+                                    </VerticalStackLayout>
+                                </Grid>
+                            </Frame>
+                        </SwipeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

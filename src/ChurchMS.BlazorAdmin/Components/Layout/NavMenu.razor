@@ -1,0 +1,85 @@
+﻿<MudNavMenu>
+    <MudNavLink Href="/" Match="NavLinkMatch.All"
+                Icon="@Icons.Material.Filled.Dashboard">Dashboard</MudNavLink>
+
+    <MudDivider Class="my-1" />
+
+    <MudNavGroup Title="Members" Icon="@Icons.Material.Filled.People" Expanded="false">
+        <MudNavLink Href="/members"
+                    Icon="@Icons.Material.Filled.PersonSearch">All Members</MudNavLink>
+        <MudNavLink Href="/visitors"
+                    Icon="@Icons.Material.Filled.PersonAdd">Visitors</MudNavLink>
+        <MudNavLink Href="/families"
+                    Icon="@Icons.Material.Filled.FamilyRestroom">Families</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Finance" Icon="@Icons.Material.Filled.AccountBalance" Expanded="false">
+        <MudNavLink Href="/contributions"
+                    Icon="@Icons.Material.Filled.Payments">Contributions</MudNavLink>
+        <MudNavLink Href="/expenses"
+                    Icon="@Icons.Material.Filled.Receipt">Expenses</MudNavLink>
+        <MudNavLink Href="/funds"
+                    Icon="@Icons.Material.Filled.Savings">Funds</MudNavLink>
+        <MudNavLink Href="/campaigns"
+                    Icon="@Icons.Material.Filled.Flag">Campaigns</MudNavLink>
+        <MudNavLink Href="/budgets"
+                    Icon="@Icons.Material.Filled.AccountBalanceWallet">Budgets</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Events" Icon="@Icons.Material.Filled.Event" Expanded="false">
+        <MudNavLink Href="/events"
+                    Icon="@Icons.Material.Filled.EventNote">All Events</MudNavLink>
+        <MudNavLink Href="/attendance"
+                    Icon="@Icons.Material.Filled.HowToReg">Attendance</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Education" Icon="@Icons.Material.Filled.School" Expanded="false">
+        <MudNavLink Href="/sunday-school"
+                    Icon="@Icons.Material.Filled.MenuBook">Sunday School</MudNavLink>
+        <MudNavLink Href="/growth-school"
+                    Icon="@Icons.Material.Filled.AutoStories">Growth School</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Communication" Icon="@Icons.Material.Filled.Message" Expanded="false">
+        <MudNavLink Href="/messaging/campaigns"
+                    Icon="@Icons.Material.Filled.Campaign">Campaigns</MudNavLink>
+        <MudNavLink Href="/messaging/appointments"
+                    Icon="@Icons.Material.Filled.CalendarMonth">Appointments</MudNavLink>
+        <MudNavLink Href="/notifications"
+                    Icon="@Icons.Material.Filled.Notifications">Notifications</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavLink Href="/departments"
+                Icon="@Icons.Material.Filled.Groups">Departments</MudNavLink>
+    <MudNavLink Href="/evangelism"
+                Icon="@Icons.Material.Filled.Public">Evangelism</MudNavLink>
+    <MudNavLink Href="/secretariat"
+                Icon="@Icons.Material.Filled.Description">Secretariat</MudNavLink>
+    <MudNavLink Href="/multimedia"
+                Icon="@Icons.Material.Filled.VideoLibrary">Multimedia</MudNavLink>
+    <MudNavLink Href="/logistics"
+                Icon="@Icons.Material.Filled.LocalShipping">Logistics</MudNavLink>
+
+    <MudDivider Class="my-1" />
+
+    <MudNavGroup Title="Reports" Icon="@Icons.Material.Filled.BarChart" Expanded="false">
+        <MudNavLink Href="/reports/financial"
+                    Icon="@Icons.Material.Filled.AttachMoney">Financial</MudNavLink>
+        <MudNavLink Href="/reports/members"
+                    Icon="@Icons.Material.Filled.PeopleAlt">Members</MudNavLink>
+        <MudNavLink Href="/reports/attendance"
+                    Icon="@Icons.Material.Filled.Analytics">Attendance</MudNavLink>
+    </MudNavGroup>
+
+    <MudNavGroup Title="Administration" Icon="@Icons.Material.Filled.AdminPanelSettings"
+                 Expanded="false">
+        <MudNavLink Href="/subscriptions"
+                    Icon="@Icons.Material.Filled.CreditCard">Subscription</MudNavLink>
+        <MudNavLink Href="/it-management/users"
+                    Icon="@Icons.Material.Filled.ManageAccounts">Users</MudNavLink>
+        <MudNavLink Href="/it-management/tickets"
+                    Icon="@Icons.Material.Filled.ConfirmationNumber">Support Tickets</MudNavLink>
+        <MudNavLink Href="/it-management/integrations"
+                    Icon="@Icons.Material.Filled.IntegrationInstructions">Integrations</MudNavLink>
+    </MudNavGroup>
+</MudNavMenu>

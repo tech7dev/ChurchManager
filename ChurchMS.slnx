@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/ChurchMS.API/ChurchMS.API.csproj" />
+    <Project Path="src/ChurchMS.Application/ChurchMS.Application.csproj" />
+    <Project Path="src/ChurchMS.BlazorAdmin/ChurchMS.BlazorAdmin.csproj" />
+    <Project Path="src/ChurchMS.Domain/ChurchMS.Domain.csproj" />
+    <Project Path="src/ChurchMS.Infrastructure/ChurchMS.Infrastructure.csproj" />
+    <Project Path="src/ChurchMS.MAUI/ChurchMS.MAUI.csproj" />
+    <Project Path="src/ChurchMS.Persistence/ChurchMS.Persistence.csproj" />
+    <Project Path="src/ChurchMS.Shared/ChurchMS.Shared.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/ChurchMS.API.Tests/ChurchMS.API.Tests.csproj" />
+    <Project Path="tests/ChurchMS.IntegrationTests/ChurchMS.IntegrationTests.csproj" />
+    <Project Path="tests/ChurchMS.UnitTests/ChurchMS.UnitTests.csproj" />
+  </Folder>
+</Solution>

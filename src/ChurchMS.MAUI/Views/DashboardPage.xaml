@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ChurchMS.MAUI.ViewModels"
+             x:Class="ChurchMS.MAUI.Views.DashboardPage"
+             x:DataType="vm:DashboardViewModel"
+             Title="{Binding Title}"
+             BackgroundColor="#F5F5F5">
+
+    <RefreshView Command="{Binding RefreshCommand}"
+                 IsRefreshing="{Binding IsBusy}">
+        <ScrollView>
+            <VerticalStackLayout Padding="16" Spacing="16">
+
+                <!-- Greeting -->
+                <Label Text="{Binding Greeting}" FontSize="20"
+                       FontAttributes="Bold" TextColor="#1565C0" />
+
+                <!-- Error -->
+                <Label Text="{Binding ErrorMessage}" TextColor="#D32F2F"
+                       IsVisible="{Binding ErrorMessage, Converter={StaticResource NotNullConverter}}" />
+
+                <!-- Loading -->
+                <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                   IsVisible="{Binding IsBusy}"
+                                   Color="#1565C0" HorizontalOptions="Center" />
+
+                <!-- Members -->
+                <Label Text="People" FontSize="13" TextColor="#666"
+                       FontAttributes="Bold" Margin="0,8,0,-8" />
+                <Grid ColumnDefinitions="*,*" RowDefinitions="*,*" ColumnSpacing="12" RowSpacing="12">
+                    <Frame Grid.Row="0" Grid.Column="0" BackgroundColor="White" CornerRadius="12" Padding="16" HasShadow="True">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="👥" FontSize="24" />
+                            <Label Text="{Binding DashboardData.TotalMembers, StringFormat='{0:N0}'}"
+                                   FontSize="24" FontAttributes="Bold" TextColor="#1565C0" />
+                            <Label Text="Total Members" FontSize="12" TextColor="#666" />
+                        </VerticalStackLayout>
+                    </Frame>
+                    <Frame Grid.Row="0" Grid.Column="1" BackgroundColor="White" CornerRadius="12" Padding="16" HasShadow="True">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="✅" FontSize="24" />
+                            <Label Text="{Binding DashboardData.ActiveMembers, StringFormat='{0:N0}'}"
+                                   FontSize="24" FontAttributes="Bold" TextColor="#2E7D32" />
+                            <Label Text="Active Members" FontSize="12" TextColor="#666" />
+                        </VerticalStackLayout>
+                    </Frame>
+                    <Frame Grid.Row="1" Grid.Column="0" BackgroundColor="White" CornerRadius="12" Padding="16" HasShadow="True">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="🆕" FontSize="24" />
+                            <Label Text="{Binding DashboardData.NewMembersThisMonth, StringFormat='{0:N0}'}"
+                                   FontSize="24" FontAttributes="Bold" TextColor="#E65100" />
+                            <Label Text="New This Month" FontSize="12" TextColor="#666" />
+                        </VerticalStackLayout>
+                    </Frame>
+                    <Frame Grid.Row="1" Grid.Column="1" BackgroundColor="White" CornerRadius="12" Padding="16" HasShadow="True">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="👁" FontSize="24" />
+                            <Label Text="{Binding DashboardData.TotalVisitors, StringFormat='{0:N0}'}"
+                                   FontSize="24" FontAttributes="Bold" TextColor="#6A1B9A" />
+                            <Label Text="Visitors" FontSize="12" TextColor="#666" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </Grid>
+
+                <!-- Finance -->
+                <Label Text="Finance" FontSize="13" TextColor="#666"
+                       FontAttributes="Bold" Margin="0,8,0,-8" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                    <Frame Grid.Column="0" BackgroundColor="White" CornerRadius="12" Padding="16" HasShadow="True">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="💰" FontSize="24" />
+                            <Label Text="{Binding DashboardData.ContributionsThisMonth, StringFormat='{0:N2}'}"
+                                   FontSize="18" FontAttributes="Bold" TextColor="#2E7D32" />
+                            <Label Text="Contributions (Month)" FontSize="11" TextColor="#666" />
+                        </VerticalStackLayout>
+                    </Frame>
+                    <Frame Grid.Column="1" BackgroundColor="White" CornerRadius="12" Padding="16" HasShadow="True">
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="📊" FontSize="24" />
+                            <Label Text="{Binding DashboardData.UpcomingEventsCount, StringFormat='{0:N0}'}"
+                                   FontSize="18" FontAttributes="Bold" TextColor="#1565C0" />
+                            <Label Text="Upcoming Events" FontSize="11" TextColor="#666" />
+                        </VerticalStackLayout>
+                    </Frame>
+                </Grid>
+
+                <!-- Logout button -->
+                <Button Text="Sign Out" Command="{Binding LogoutCommand}"
+                        BackgroundColor="Transparent" TextColor="#666"
+                        BorderColor="#E0E0E0" BorderWidth="1"
+                        CornerRadius="8" Margin="0,16,0,0" />
+
+            </VerticalStackLayout>
+        </ScrollView>
+    </RefreshView>
+</ContentPage>

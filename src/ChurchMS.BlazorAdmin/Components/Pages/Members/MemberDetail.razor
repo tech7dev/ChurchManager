@@ -1,0 +1,187 @@
+@page "/members/{Id:guid}"
+@attribute [Authorize]
+@inject MemberService MemberService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>Member Detail — ChurchMS</PageTitle>
+
+@if (_loading)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+}
+else if (_member is null)
+{
+    <MudAlert Severity="Severity.Error">Member not found.</MudAlert>
+    <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" Href="/members" Class="mt-3">
+        Back to Members
+    </MudButton>
+}
+else
+{
+    <div class="d-flex align-center justify-space-between mb-4">
+        <div class="d-flex align-center gap-3">
+            <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Href="/members" />
+            <MudAvatar Color="Color.Primary" Size="Size.Large">
+                @_member.FirstName[0]
+            </MudAvatar>
+            <div>
+                <MudText Typo="Typo.h5">@_member.FullName</MudText>
+                <MudText Typo="Typo.body2" Color="Color.Secondary">
+                    @_member.MembershipNumber
+                </MudText>
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <MudChip T="string" Color="@StatusColor(_member.Status)" Label="true">
+                @_member.Status
+            </MudChip>
+            <MudButton Variant="Variant.Outlined" Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Edit"
+                       Href="@($"/members/{Id}/edit")">Edit</MudButton>
+        </div>
+    </div>
+
+    <MudGrid>
+        <MudItem xs="12" md="6">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.subtitle1">Personal Information</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudGrid>
+                        <MudItem xs="6">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Gender</MudText>
+                            <MudText>@(_member.Gender?.ToString() ?? "—")</MudText>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Date of Birth</MudText>
+                            <MudText>@(_member.DateOfBirth?.ToString("d") ?? "—")</MudText>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Marital Status</MudText>
+                            <MudText>@(_member.MaritalStatus?.ToString() ?? "—")</MudText>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Blood Type</MudText>
+                            <MudText>@(_member.BloodType?.ToString() ?? "—")</MudText>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Occupation</MudText>
+                            <MudText>@(_member.Occupation ?? "—")</MudText>
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="6">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.subtitle1">Contact</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudGrid>
+                        <MudItem xs="6">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Phone</MudText>
+                            <MudText>@(_member.Phone ?? "—")</MudText>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Email</MudText>
+                            <MudText>@(_member.Email ?? "—")</MudText>
+                        </MudItem>
+                        <MudItem xs="12">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Address</MudText>
+                            <MudText>@(string.Join(", ",
+                                new[]{ _member.Address, _member.City, _member.State, _member.Country }
+                                .Where(s => !string.IsNullOrWhiteSpace(s))))</MudText>
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="6">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.subtitle1">Church Membership</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudGrid>
+                        <MudItem xs="6">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Join Date</MudText>
+                            <MudText>@(_member.JoinDate?.ToString("d") ?? "—")</MudText>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Baptism Date</MudText>
+                            <MudText>@(_member.BaptismDate?.ToString("d") ?? "—")</MudText>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Family</MudText>
+                            <MudText>@(_member.FamilyName ?? "—")</MudText>
+                        </MudItem>
+                        <MudItem xs="6">
+                            <MudText Typo="Typo.caption" Color="Color.Secondary">Family Role</MudText>
+                            <MudText>@(_member.FamilyRole?.ToString() ?? "—")</MudText>
+                        </MudItem>
+                    </MudGrid>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        @if (!string.IsNullOrWhiteSpace(_member.Notes))
+        {
+            <MudItem xs="12" md="6">
+                <MudCard Elevation="2">
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.subtitle1">Notes</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudText>@_member.Notes</MudText>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        }
+    </MudGrid>
+}
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    private MemberDto? _member;
+    private bool _loading = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _loading = true;
+        try
+        {
+            _member = await MemberService.GetByIdAsync(Id);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading member: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private static Color StatusColor(MemberStatus status) => status switch
+    {
+        MemberStatus.Active => Color.Success,
+        MemberStatus.Inactive => Color.Default,
+        MemberStatus.Deceased => Color.Dark,
+        MemberStatus.Transferred => Color.Warning,
+        _ => Color.Default
+    };
+}

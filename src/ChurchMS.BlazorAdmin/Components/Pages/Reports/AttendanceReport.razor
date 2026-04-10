@@ -1,0 +1,151 @@
+@page "/reports/attendance"
+@attribute [Authorize]
+@inject ReportService ReportService
+@inject ISnackbar Snackbar
+
+<PageTitle>Attendance Report — ChurchMS</PageTitle>
+
+<MudText Typo="Typo.h4" GutterBottom="true">Attendance Report</MudText>
+
+<MudPaper Class="mb-4 pa-4" Elevation="1">
+    <MudGrid AlignItems="AlignItems.End">
+        <MudItem xs="12" sm="4">
+            <MudDatePicker Label="From" @bind-Date="_from" DateFormat="yyyy-MM-dd" />
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudDatePicker Label="To" @bind-Date="_to" DateFormat="yyyy-MM-dd" />
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Search"
+                       OnClick="@Load" Disabled="@_loading" FullWidth="true">
+                Generate Report
+            </MudButton>
+        </MudItem>
+    </MudGrid>
+</MudPaper>
+
+@if (_loading)
+{
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mb-4" />
+}
+
+@if (_data is not null)
+{
+    <MudGrid Spacing="3" Class="mb-4">
+        <MudItem xs="12" sm="4">
+            <StatCard Title="Event Sessions" Value="@_data.TotalEventSessions.ToString()"
+                      Icon="@Icons.Material.Filled.Event" Color="Color.Primary" />
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <StatCard Title="Total Attendees" Value="@_data.TotalAttendanceRecords.ToString()"
+                      Icon="@Icons.Material.Filled.HowToReg" Color="Color.Success" />
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <StatCard Title="Avg per Event" Value="@_data.AverageAttendancePerEvent.ToString("N1")"
+                      Icon="@Icons.Material.Filled.Analytics" Color="Color.Info" />
+        </MudItem>
+    </MudGrid>
+
+    <MudGrid Spacing="3">
+        <MudItem xs="12" md="8">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.subtitle1">Per-Event Breakdown</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent Class="pa-0">
+                    <MudSimpleTable Dense="true" Hover="true">
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Date</th>
+                                <th>Registered</th>
+                                <th>Attended</th>
+                                <th>Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var ev in _data.ByEvent)
+                            {
+                                <tr>
+                                    <td>@ev.EventName</td>
+                                    <td>@ev.EventDate.ToString("d")</td>
+                                    <td>@ev.Registered</td>
+                                    <td>@ev.Attended</td>
+                                    <td>
+                                        <MudChip T="string" Size="Size.Small" Label="true"
+                                                 Color="@RateColor(ev.AttendanceRate)">
+                                            @ev.AttendanceRate.ToString("N1")%
+                                        </MudChip>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+
+        <MudItem xs="12" md="4">
+            <MudCard Elevation="2">
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.subtitle1">Monthly Trend</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent Class="pa-0">
+                    <MudSimpleTable Dense="true" Hover="true">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Attendees</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var m in _data.MonthlyTrend)
+                            {
+                                <tr>
+                                    <td>@m.MonthLabel</td>
+                                    <td><strong>@m.TotalAttendees</strong></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </MudSimpleTable>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+}
+
+@code {
+    private DateTime? _from = DateTime.UtcNow.AddMonths(-3);
+    private DateTime? _to = DateTime.UtcNow;
+    private AttendanceReportDto? _data;
+    private bool _loading;
+
+    protected override async Task OnInitializedAsync() => await Load();
+
+    private async Task Load()
+    {
+        if (_from is null || _to is null) return;
+        _loading = true;
+        try
+        {
+            _data = await ReportService.GetAttendanceReportAsync(_from.Value, _to.Value);
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading report: {ex.Message}", Severity.Error);
+        }
+        finally { _loading = false; }
+    }
+
+    private static Color RateColor(double rate) => rate switch
+    {
+        >= 80 => Color.Success,
+        >= 50 => Color.Warning,
+        _ => Color.Error
+    };
+}

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ChurchMS.MAUI.ViewModels"
+             x:Class="ChurchMS.MAUI.Views.LoginPage"
+             x:DataType="vm:LoginViewModel"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#1565C0">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="32,60,32,32" Spacing="0"
+                             VerticalOptions="Center">
+
+            <!-- Logo / Header -->
+            <Image Source="appicon.png" HeightRequest="80" WidthRequest="80"
+                   HorizontalOptions="Center" Margin="0,0,0,16" />
+            <Label Text="ChurchMS" FontSize="32" FontAttributes="Bold"
+                   TextColor="White" HorizontalOptions="Center" />
+            <Label Text="Church Management System" FontSize="14"
+                   TextColor="#B3E5FC" HorizontalOptions="Center" Margin="0,4,0,40" />
+
+            <!-- Card -->
+            <Frame BackgroundColor="White" CornerRadius="16" Padding="24"
+                   HasShadow="True">
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="Sign In" FontSize="20" FontAttributes="Bold"
+                           HorizontalOptions="Center" Margin="0,0,0,8" />
+
+                    <!-- Email -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Email" FontSize="13" TextColor="#666" />
+                        <Frame Padding="12,0" BorderColor="#E0E0E0" CornerRadius="8" HasShadow="False">
+                            <Entry Text="{Binding Email}"
+                                   Placeholder="admin@church.org"
+                                   Keyboard="Email"
+                                   ReturnType="Next" />
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <!-- Password -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Password" FontSize="13" TextColor="#666" />
+                        <Frame Padding="12,0" BorderColor="#E0E0E0" CornerRadius="8" HasShadow="False">
+                            <Entry Text="{Binding Password}"
+                                   Placeholder="••••••••"
+                                   IsPassword="True"
+                                   ReturnType="Done"
+                                   ReturnCommand="{Binding LoginCommand}" />
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <!-- Error message -->
+                    <Label Text="{Binding ErrorMessage}" TextColor="#D32F2F"
+                           FontSize="13" IsVisible="{Binding ErrorMessage, Converter={StaticResource NotNullConverter}}" />
+
+                    <!-- Sign In Button -->
+                    <Button Text="Sign In" Command="{Binding LoginCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            BackgroundColor="#1565C0" TextColor="White"
+                            CornerRadius="8" HeightRequest="48"
+                            FontAttributes="Bold" FontSize="16" />
+
+                    <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                       IsVisible="{Binding IsBusy}"
+                                       Color="#1565C0"
+                                       HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,36 @@
+using ChurchMS.Application.Features.Members.DTOs;
+using ChurchMS.Domain.Enums;
+using ChurchMS.Shared.Models;
+using MediatR;
+
+namespace ChurchMS.Application.Features.Members.Commands.UpdateMember;
+
+public class UpdateMemberCommand : IRequest<ApiResponse<MemberDto>>
+{
+    public Guid Id { get; set; }
+    public string FirstName { get; set; } = string.Empty;
+    public string? MiddleName { get; set; }
+    public string LastName { get; set; } = string.Empty;
+    public DateOnly? DateOfBirth { get; set; }
+    public Gender? Gender { get; set; }
+    public MaritalStatus? MaritalStatus { get; set; }
+    public BloodType? BloodType { get; set; }
+    public string? NationalId { get; set; }
+    public string? Phone { get; set; }
+    public string? AlternatePhone { get; set; }
+    public string? Email { get; set; }
+    public string? Address { get; set; }
+    public string? City { get; set; }
+    public string? State { get; set; }
+    public string? Country { get; set; }
+    public string? PostalCode { get; set; }
+    public MemberStatus Status { get; set; }
+    public DateOnly? JoinDate { get; set; }
+    public DateOnly? BaptismDate { get; set; }
+    public string? BaptizedBy { get; set; }
+    public string? Notes { get; set; }
+    public string? Occupation { get; set; }
+    public string? Employer { get; set; }
+    public Guid? FamilyId { get; set; }
+    public FamilyRole? FamilyRole { get; set; }
+}

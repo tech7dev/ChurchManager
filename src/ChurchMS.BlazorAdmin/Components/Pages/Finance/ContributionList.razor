@@ -1,0 +1,82 @@
+@page "/contributions"
+@attribute [Authorize]
+@inject FinanceService FinanceService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>Contributions — ChurchMS</PageTitle>
+
+<div class="d-flex align-center justify-space-between mb-4">
+    <MudText Typo="Typo.h4">Contributions</MudText>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.Add"
+               Href="/contributions/new">Record Contribution</MudButton>
+</div>
+
+<MudTable ServerData="@ServerLoad" Dense="true" Hover="true" @ref="_table"
+          RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Primary"
+          OnRowClick="@(row => Navigation.NavigateTo($"/contributions/{row.Item.Id}"))">
+    <HeaderContent>
+        <MudTh>Reference</MudTh>
+        <MudTh>Date</MudTh>
+        <MudTh>Member / Donor</MudTh>
+        <MudTh>Fund</MudTh>
+        <MudTh>Campaign</MudTh>
+        <MudTh>Type</MudTh>
+        <MudTh>Amount</MudTh>
+        <MudTh>Status</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Ref">
+            <MudText Typo="Typo.caption" Style="font-family:monospace">@context.ReferenceNumber</MudText>
+        </MudTd>
+        <MudTd DataLabel="Date">@context.ContributionDate.ToString("d")</MudTd>
+        <MudTd DataLabel="Member">@(context.MemberName ?? context.AnonymousDonorName ?? "Anonymous")</MudTd>
+        <MudTd DataLabel="Fund">@context.FundName</MudTd>
+        <MudTd DataLabel="Campaign">@(context.CampaignName ?? "—")</MudTd>
+        <MudTd DataLabel="Type">@context.Type</MudTd>
+        <MudTd DataLabel="Amount">
+            <MudText Style="font-weight:600">@context.Amount.ToString("N2") @context.Currency</MudText>
+        </MudTd>
+        <MudTd DataLabel="Status">
+            <MudChip T="string" Size="Size.Small" Color="@ContributionStatusColor(context.Status)" Label="true">
+                @context.Status
+            </MudChip>
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText Align="Align.Center" Class="pa-4">No contributions found.</MudText>
+    </NoRecordsContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<ContributionListDto> _table = null!;
+    private bool _loading;
+
+    private async Task<TableData<ContributionListDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await FinanceService.GetContributionsAsync(
+                state.Page + 1, state.PageSize);
+            return new TableData<ContributionListDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+
+    private static Color ContributionStatusColor(ContributionStatus status) => status switch
+    {
+        ContributionStatus.Confirmed => Color.Success,
+        ContributionStatus.Pending => Color.Warning,
+        ContributionStatus.Cancelled => Color.Error,
+        _ => Color.Default
+    };
+}

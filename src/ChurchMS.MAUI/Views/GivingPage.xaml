@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ChurchMS.MAUI.ViewModels"
+             xmlns:dtos="clr-namespace:ChurchMS.Application.Features.Contributions.DTOs;assembly=ChurchMS.Application"
+             x:Class="ChurchMS.MAUI.Views.GivingPage"
+             x:DataType="vm:GivingViewModel"
+             Title="{Binding Title}"
+             BackgroundColor="#F5F5F5">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="16" Spacing="16">
+
+            <!-- Give Now Card -->
+            <Frame BackgroundColor="White" CornerRadius="12" Padding="20" HasShadow="True">
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="Record a Contribution" FontSize="16"
+                           FontAttributes="Bold" TextColor="#1565C0" />
+
+                    <!-- Amount -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Amount" FontSize="13" TextColor="#666" />
+                        <Frame Padding="12,8" BorderColor="#E0E0E0" CornerRadius="8" HasShadow="False">
+                            <Entry Text="{Binding Amount, StringFormat='{0:N2}'}"
+                                   Keyboard="Numeric" Placeholder="0.00"
+                                   FontSize="20" FontAttributes="Bold" TextColor="#1565C0" />
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <!-- Fund -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Fund" FontSize="13" TextColor="#666" />
+                        <Picker ItemsSource="{Binding Funds}"
+                                ItemDisplayBinding="{Binding Name}"
+                                SelectedItem="{Binding SelectedFund}"
+                                Title="Select a fund..." />
+                    </VerticalStackLayout>
+
+                    <!-- Type -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Payment Method" FontSize="13" TextColor="#666" />
+                        <Picker SelectedItem="{Binding Type}" Title="Payment type">
+                            <Picker.Items>
+                                <x:String>Cash</x:String>
+                                <x:String>BankTransfer</x:String>
+                                <x:String>MobileMoney</x:String>
+                                <x:String>Cheque</x:String>
+                            </Picker.Items>
+                        </Picker>
+                    </VerticalStackLayout>
+
+                    <!-- Notes -->
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Notes (optional)" FontSize="13" TextColor="#666" />
+                        <Frame Padding="12,8" BorderColor="#E0E0E0" CornerRadius="8" HasShadow="False">
+                            <Editor Text="{Binding Notes}" Placeholder="Optional note..."
+                                    AutoSize="TextChanges" MaxLength="500" />
+                        </Frame>
+                    </VerticalStackLayout>
+
+                    <!-- Error -->
+                    <Label Text="{Binding ErrorMessage}" TextColor="#D32F2F"
+                           IsVisible="{Binding ErrorMessage, Converter={StaticResource NotNullConverter}}" />
+
+                    <!-- Submit -->
+                    <Button Text="Submit Contribution"
+                            Command="{Binding SubmitGivingCommand}"
+                            IsEnabled="{Binding IsNotBusy}"
+                            BackgroundColor="#2E7D32" TextColor="White"
+                            CornerRadius="8" HeightRequest="48"
+                            FontAttributes="Bold" />
+
+                    <ActivityIndicator IsRunning="{Binding IsBusy}"
+                                       IsVisible="{Binding IsBusy}"
+                                       Color="#1565C0" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- Recent contributions -->
+            <Label Text="Recent Contributions" FontSize="14" FontAttributes="Bold"
+                   Margin="0,8,0,0" />
+
+            <CollectionView ItemsSource="{Binding RecentContributions}"
+                            HeightRequest="300"
+                            EmptyView="No recent contributions.">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="dtos:ContributionListDto">
+                        <Frame Margin="0,4" Padding="12" CornerRadius="10"
+                               BackgroundColor="White" HasShadow="False">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                    <Label Text="{Binding FundName}" FontAttributes="Bold" FontSize="14" />
+                                    <Label Text="{Binding ContributionDate}" FontSize="12" TextColor="#666" />
+                                </VerticalStackLayout>
+                                <Label Grid.Column="1"
+                                       Text="{Binding Amount, StringFormat='{0:N2}'}"
+                                       FontAttributes="Bold" FontSize="16"
+                                       TextColor="#2E7D32" VerticalOptions="Center" />
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

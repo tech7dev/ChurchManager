@@ -1,0 +1,127 @@
+@page "/members"
+@attribute [Authorize]
+@inject MemberService MemberService
+@inject NavigationManager Navigation
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<PageTitle>Members — ChurchMS</PageTitle>
+
+<div class="d-flex align-center justify-space-between mb-4">
+    <MudText Typo="Typo.h4">Members</MudText>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.PersonAdd"
+               Href="/members/new">Add Member</MudButton>
+</div>
+
+<MudPaper Class="mb-4 pa-3" Elevation="1">
+    <MudTextField T="string" @bind-Value="_search"
+                  Label="Search by name, phone, email or membership number..."
+                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
+                  Immediate="false" DebounceInterval="400"
+                  OnDebounceIntervalElapsed="@(_ => _table.ReloadServerData())"
+                  Clearable="true" OnClearButtonClick="@(() => { _search = string.Empty; _table.ReloadServerData(); })" />
+</MudPaper>
+
+<MudTable ServerData="@ServerLoad" Dense="true" Hover="true" @ref="_table"
+          RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Primary"
+          OnRowClick="@(row => Navigation.NavigateTo($"/members/{row.Item.Id}"))">
+    <HeaderContent>
+        <MudTh>No.</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh>Phone</MudTh>
+        <MudTh>Email</MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh>Joined</MudTh>
+        <MudTh Style="width:100px">Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="No.">
+            <MudText Typo="Typo.body2">@context.MembershipNumber</MudText>
+        </MudTd>
+        <MudTd DataLabel="Name">
+            <div class="d-flex align-center gap-2">
+                <MudAvatar Size="Size.Small" Color="Color.Primary">
+                    @context.FirstName[0]
+                </MudAvatar>
+                <MudText>@context.FullName</MudText>
+            </div>
+        </MudTd>
+        <MudTd DataLabel="Phone">@context.Phone</MudTd>
+        <MudTd DataLabel="Email">@context.Email</MudTd>
+        <MudTd DataLabel="Status">
+            <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)" Label="true">
+                @context.Status
+            </MudChip>
+        </MudTd>
+        <MudTd DataLabel="Joined">@context.JoinDate?.ToString("d")</MudTd>
+        <MudTd>
+            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small"
+                           OnClick="@(() => Navigation.NavigateTo($"/members/{context.Id}/edit"))"
+                           @onclick:stopPropagation="true" />
+            <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" Size="Size.Small"
+                           Color="Color.Error"
+                           OnClick="@(() => DeleteAsync(context.Id, context.FullName))"
+                           @onclick:stopPropagation="true" />
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText Align="Align.Center" Class="pa-4">No members found.</MudText>
+    </NoRecordsContent>
+    <LoadingContent>
+        <MudText Align="Align.Center" Class="pa-4">Loading...</MudText>
+    </LoadingContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<MemberListDto> _table = null!;
+    private string _search = string.Empty;
+    private bool _loading;
+
+    private async Task<TableData<MemberListDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await MemberService.GetMembersAsync(
+                state.Page + 1, state.PageSize, _search);
+            return new TableData<MemberListDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+
+    private static Color StatusColor(MemberStatus status) => status switch
+    {
+        MemberStatus.Active => Color.Success,
+        MemberStatus.Inactive => Color.Default,
+        MemberStatus.Deceased => Color.Dark,
+        MemberStatus.Transferred => Color.Warning,
+        _ => Color.Default
+    };
+
+    private async Task DeleteAsync(Guid id, string name)
+    {
+        var ok = await DialogService.ShowMessageBox(
+            "Confirm Removal",
+            $"Remove {name} from the member list?",
+            yesText: "Remove", cancelText: "Cancel");
+        if (ok != true) return;
+
+        if (await MemberService.DeleteAsync(id))
+        {
+            Snackbar.Add($"{name} removed.", Severity.Success);
+            await _table.ReloadServerData();
+        }
+        else
+        {
+            Snackbar.Add("Failed to remove member.", Severity.Error);
+        }
+    }
+}

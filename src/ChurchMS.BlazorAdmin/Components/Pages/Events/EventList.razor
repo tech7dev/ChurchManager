@@ -1,0 +1,96 @@
+@page "/events"
+@attribute [Authorize]
+@inject EventService EventService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>Events — ChurchMS</PageTitle>
+
+<div class="d-flex align-center justify-space-between mb-4">
+    <MudText Typo="Typo.h4">Events</MudText>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.Add"
+               Href="/events/new">New Event</MudButton>
+</div>
+
+<MudPaper Class="mb-4 pa-3" Elevation="1">
+    <MudTextField T="string" @bind-Value="_search"
+                  Label="Search events..."
+                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
+                  Immediate="false" DebounceInterval="400"
+                  OnDebounceIntervalElapsed="@(_ => _table.ReloadServerData())"
+                  Clearable="true"
+                  OnClearButtonClick="@(() => { _search = string.Empty; _table.ReloadServerData(); })" />
+</MudPaper>
+
+<MudTable ServerData="@ServerLoad" Dense="true" Hover="true" @ref="_table"
+          RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Primary"
+          OnRowClick="@(row => Navigation.NavigateTo($"/events/{row.Item.Id}"))">
+    <HeaderContent>
+        <MudTh>Title</MudTh>
+        <MudTh>Type</MudTh>
+        <MudTh>Date & Time</MudTh>
+        <MudTh>Location</MudTh>
+        <MudTh>Status</MudTh>
+        <MudTh>Registrations</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Title">
+            <MudText Typo="Typo.body2" Style="font-weight:500">@context.Title</MudText>
+        </MudTd>
+        <MudTd DataLabel="Type">@context.Type</MudTd>
+        <MudTd DataLabel="Date">@context.StartDateTime.ToString("g")</MudTd>
+        <MudTd DataLabel="Location">@(context.Location ?? "Online")</MudTd>
+        <MudTd DataLabel="Status">
+            <MudChip T="string" Size="Size.Small" Color="@EventStatusColor(context.Status)" Label="true">
+                @context.Status
+            </MudChip>
+        </MudTd>
+        <MudTd DataLabel="Registrations">
+            @if (context.RequiresRegistration)
+            {
+                <MudText>@context.RegistrationCount / @(context.MaxAttendees?.ToString() ?? "∞")</MudText>
+            }
+            else
+            {
+                <MudText Color="Color.Secondary">Open</MudText>
+            }
+        </MudTd>
+    </RowTemplate>
+    <NoRecordsContent>
+        <MudText Align="Align.Center" Class="pa-4">No events found.</MudText>
+    </NoRecordsContent>
+    <PagerContent>
+        <MudTablePager />
+    </PagerContent>
+</MudTable>
+
+@code {
+    private MudTable<EventListDto> _table = null!;
+    private string _search = string.Empty;
+    private bool _loading;
+
+    private async Task<TableData<EventListDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await EventService.GetEventsAsync(state.Page + 1, state.PageSize, _search);
+            return new TableData<EventListDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+
+    private static Color EventStatusColor(EventStatus status) => status switch
+    {
+        EventStatus.Published => Color.Success,
+        EventStatus.Draft => Color.Default,
+        EventStatus.Cancelled => Color.Error,
+        EventStatus.Completed => Color.Info,
+        _ => Color.Default
+    };
+}

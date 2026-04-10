@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:ChurchMS.MAUI.ViewModels"
+             xmlns:dtos="clr-namespace:ChurchMS.Application.Features.Events.DTOs;assembly=ChurchMS.Application"
+             x:Class="ChurchMS.MAUI.Views.EventsPage"
+             x:DataType="vm:EventsViewModel"
+             Title="{Binding Title}"
+             BackgroundColor="#F5F5F5">
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- QR Scan button -->
+        <Button Grid.Row="0" Text="📷 Scan QR for Attendance"
+                Command="{Binding ScanQrCommand}"
+                BackgroundColor="#1565C0" TextColor="White"
+                CornerRadius="0" HeightRequest="48" />
+
+        <!-- Events List -->
+        <RefreshView Grid.Row="1" Command="{Binding LoadCommand}"
+                     IsRefreshing="{Binding IsBusy}">
+            <CollectionView ItemsSource="{Binding Events}"
+                            SelectionMode="None"
+                            EmptyView="No upcoming events.">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="dtos:EventListDto">
+                        <Frame Margin="8,4" Padding="16" CornerRadius="10"
+                               BackgroundColor="White" HasShadow="False">
+                            <Grid ColumnDefinitions="4,*" ColumnSpacing="12">
+                                <!-- Color accent -->
+                                <BoxView Grid.Column="0" BackgroundColor="#1565C0"
+                                         CornerRadius="2" VerticalOptions="Fill" />
+
+                                <!-- Content -->
+                                <VerticalStackLayout Grid.Column="1" Spacing="4">
+                                    <Label Text="{Binding Title}" FontAttributes="Bold" FontSize="15" />
+                                    <Label Text="{Binding StartDateTime, StringFormat='{0:g}'}"
+                                           FontSize="13" TextColor="#1565C0" />
+                                    <Label Text="{Binding Location}" FontSize="12" TextColor="#666"
+                                           IsVisible="{Binding Location, Converter={StaticResource NotNullConverter}}" />
+                                    <HorizontalStackLayout Spacing="8" Margin="0,4,0,0">
+                                        <Frame Padding="6,2" CornerRadius="4"
+                                               BackgroundColor="#E3F2FD" HasShadow="False">
+                                            <Label Text="{Binding Type}" FontSize="11" TextColor="#1565C0" />
+                                        </Frame>
+                                        <Frame Padding="6,2" CornerRadius="4"
+                                               BackgroundColor="#E8F5E9" HasShadow="False">
+                                            <Label Text="{Binding Status}" FontSize="11" TextColor="#2E7D32" />
+                                        </Frame>
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+                            </Grid>
+                        </Frame>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </Grid>
+</ContentPage>

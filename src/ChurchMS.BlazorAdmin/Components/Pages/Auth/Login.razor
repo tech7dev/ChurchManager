@@ -1,0 +1,83 @@
+@page "/login"
+@inject IAuthService AuthService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>Sign In — ChurchMS</PageTitle>
+
+<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;
+            background:linear-gradient(135deg,#1565C0 0%,#0D47A1 100%);">
+    <MudCard Style="width:400px" Elevation="8">
+        <MudCardHeader>
+            <CardHeaderContent>
+                <div class="d-flex flex-column align-center pa-2">
+                    <MudIcon Icon="@Icons.Material.Filled.Church"
+                             Size="Size.Large" Color="Color.Primary" Class="mb-2" />
+                    <MudText Typo="Typo.h5">ChurchMS Admin</MudText>
+                    <MudText Typo="Typo.body2" Color="Color.Secondary">
+                        Sign in to manage your church
+                    </MudText>
+                </div>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudForm @ref="_form" @bind-IsValid="_valid">
+                <MudTextField T="string" @bind-Value="_email"
+                              Label="Email address"
+                              InputType="InputType.Email"
+                              Required="true" RequiredError="Email is required"
+                              Adornment="Adornment.Start"
+                              AdornmentIcon="@Icons.Material.Filled.Email"
+                              Class="mb-3" />
+                <MudTextField T="string" @bind-Value="_password"
+                              Label="Password"
+                              InputType="@(_showPassword ? InputType.Text : InputType.Password)"
+                              Required="true" RequiredError="Password is required"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@(_showPassword
+                                  ? Icons.Material.Filled.Visibility
+                                  : Icons.Material.Filled.VisibilityOff)"
+                              OnAdornmentClick="() => _showPassword = !_showPassword" />
+            </MudForm>
+        </MudCardContent>
+        <MudCardActions Class="px-4 pb-4 d-flex flex-column gap-2">
+            <MudButton FullWidth="true" Variant="Variant.Filled" Color="Color.Primary"
+                       Size="Size.Large" OnClick="@HandleLogin" Disabled="@_loading">
+                @if (_loading)
+                {
+                    <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                }
+                Sign In
+            </MudButton>
+        </MudCardActions>
+    </MudCard>
+</div>
+
+@code {
+    private MudForm _form = null!;
+    private string _email = string.Empty;
+    private string _password = string.Empty;
+    private bool _valid;
+    private bool _loading;
+    private bool _showPassword;
+
+    private async Task HandleLogin()
+    {
+        await _form.Validate();
+        if (!_valid) return;
+
+        _loading = true;
+        try
+        {
+            var success = await AuthService.LoginAsync(_email, _password);
+            if (success)
+                Navigation.NavigateTo("/", true);
+            else
+                Snackbar.Add("Invalid credentials. Please try again.", Severity.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+}

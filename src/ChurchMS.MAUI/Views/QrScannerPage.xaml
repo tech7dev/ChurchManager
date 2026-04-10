@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+             x:Class="ChurchMS.MAUI.Views.QrScannerPage"
+             Title="Scan QR Code"
+             BackgroundColor="Black">
+
+    <Grid RowDefinitions="*,Auto">
+        <!-- QR Camera View -->
+        <zxing:CameraBarcodeReaderView
+            Grid.Row="0"
+            x:Name="BarcodeReader"
+            BarcodesDetected="OnBarcodeDetected"
+            IsDetecting="True">
+            <zxing:CameraBarcodeReaderView.Options>
+                <zxing:BarcodeReaderOptions
+                    Formats="QrCode"
+                    AutoRotate="True"
+                    Multiple="False" />
+            </zxing:CameraBarcodeReaderView.Options>
+        </zxing:CameraBarcodeReaderView>
+
+        <!-- Overlay -->
+        <Grid Grid.Row="0">
+            <BoxView BackgroundColor="Black" Opacity="0.4" />
+            <!-- Scanner frame -->
+            <Frame WidthRequest="240" HeightRequest="240"
+                   BackgroundColor="Transparent"
+                   BorderColor="White" CornerRadius="12"
+                   HorizontalOptions="Center" VerticalOptions="Center" />
+            <Label Text="Align QR code within the frame"
+                   TextColor="White" FontSize="14"
+                   HorizontalOptions="Center" VerticalOptions="End"
+                   Margin="0,0,0,40" />
+        </Grid>
+
+        <!-- Result / Cancel -->
+        <Frame Grid.Row="1" BackgroundColor="White" Padding="20" CornerRadius="0">
+            <VerticalStackLayout Spacing="12">
+                <Label x:Name="ResultLabel" Text="Waiting for QR code..."
+                       HorizontalOptions="Center" TextColor="#666" FontSize="14" />
+                <Button Text="Cancel" Clicked="OnCancelClicked"
+                        BackgroundColor="Transparent" TextColor="#666"
+                        BorderColor="#E0E0E0" BorderWidth="1"
+                        CornerRadius="8" HeightRequest="44" />
+            </VerticalStackLayout>
+        </Frame>
+    </Grid>
+</ContentPage>
