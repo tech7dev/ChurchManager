@@ -11,6 +11,9 @@ obj/
 **/[Pp]ackages/*
 !**/[Pp]ackages/build/
 
+## Publish output
+publish/
+
 ## Build results
 [Dd]ebug/
 [Rr]elease/
