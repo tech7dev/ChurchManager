@@ -1,4 +1,5 @@
 using ChurchMS.BlazorAdmin.Auth;
+using Fluxor;
 using ChurchMS.BlazorAdmin.Components;
 using ChurchMS.BlazorAdmin.Services;
 using Microsoft.AspNetCore.Components.Authorization;

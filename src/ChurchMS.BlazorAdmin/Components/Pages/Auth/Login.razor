@@ -5,52 +5,119 @@
 
 <PageTitle>Sign In — ChurchMS</PageTitle>
 
-<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;
-            background:linear-gradient(135deg,#1565C0 0%,#0D47A1 100%);">
-    <MudCard Style="width:400px" Elevation="8">
-        <MudCardHeader>
-            <CardHeaderContent>
-                <div class="d-flex flex-column align-center pa-2">
-                    <MudIcon Icon="@Icons.Material.Filled.Church"
-                             Size="Size.Large" Color="Color.Primary" Class="mb-2" />
-                    <MudText Typo="Typo.h5">ChurchMS Admin</MudText>
-                    <MudText Typo="Typo.body2" Color="Color.Secondary">
-                        Sign in to manage your church
-                    </MudText>
+<div class="cms-login-wrap">
+    <!-- Brand panel (hidden on mobile) -->
+    <div class="cms-login-brand">
+        <div class="cms-login-brand-logo">
+            <MudIcon Icon="@Icons.Material.Filled.Church"
+                     Style="color:white;font-size:2.5rem;" />
+        </div>
+        <MudText Typo="Typo.h4"
+                 Style="color:white;font-weight:700;text-align:center;margin-bottom:0.25rem;">
+            ChurchMS
+        </MudText>
+        <MudText Typo="Typo.body1"
+                 Style="color:rgba(255,255,255,0.75);text-align:center;max-width:280px;">
+            Complete church management for growing congregations
+        </MudText>
+
+        <div class="cms-login-brand-features">
+            <div class="cms-login-feature">
+                <div class="cms-login-feature-icon">
+                    <MudIcon Icon="@Icons.Material.Outlined.People"
+                             Style="color:white;" Size="Size.Small" />
                 </div>
-            </CardHeaderContent>
-        </MudCardHeader>
-        <MudCardContent>
+                <span>Member &amp; family management</span>
+            </div>
+            <div class="cms-login-feature">
+                <div class="cms-login-feature-icon">
+                    <MudIcon Icon="@Icons.Material.Outlined.AccountBalance"
+                             Style="color:white;" Size="Size.Small" />
+                </div>
+                <span>Financial tracking &amp; reporting</span>
+            </div>
+            <div class="cms-login-feature">
+                <div class="cms-login-feature-icon">
+                    <MudIcon Icon="@Icons.Material.Outlined.Event"
+                             Style="color:white;" Size="Size.Small" />
+                </div>
+                <span>Events &amp; attendance</span>
+            </div>
+            <div class="cms-login-feature">
+                <div class="cms-login-feature-icon">
+                    <MudIcon Icon="@Icons.Material.Outlined.Message"
+                             Style="color:white;" Size="Size.Small" />
+                </div>
+                <span>SMS &amp; messaging campaigns</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Form panel -->
+    <div class="cms-login-form">
+        <div style="width:100%;max-width:380px;">
+            <div class="d-flex align-center gap-2 mb-6">
+                <MudAvatar Color="Color.Primary" Size="Size.Medium"
+                           Style="border-radius:10px;">
+                    <MudIcon Icon="@Icons.Material.Filled.Church" Size="Size.Small" />
+                </MudAvatar>
+                <div>
+                    <MudText Typo="Typo.h6"
+                             Style="font-weight:700;line-height:1.2;">ChurchMS</MudText>
+                    <MudText Typo="Typo.caption"
+                             Style="color:rgba(0,0,0,0.45);">Admin Portal</MudText>
+                </div>
+            </div>
+
+            <MudText Typo="Typo.h5" Class="mb-1" Style="font-weight:700;">
+                Welcome back
+            </MudText>
+            <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-5">
+                Sign in to your admin account
+            </MudText>
+
             <MudForm @ref="_form" @bind-IsValid="_valid">
                 <MudTextField T="string" @bind-Value="_email"
                               Label="Email address"
                               InputType="InputType.Email"
                               Required="true" RequiredError="Email is required"
+                              Variant="Variant.Outlined"
                               Adornment="Adornment.Start"
-                              AdornmentIcon="@Icons.Material.Filled.Email"
+                              AdornmentIcon="@Icons.Material.Outlined.Email"
                               Class="mb-3" />
                 <MudTextField T="string" @bind-Value="_password"
                               Label="Password"
                               InputType="@(_showPassword ? InputType.Text : InputType.Password)"
                               Required="true" RequiredError="Password is required"
+                              Variant="Variant.Outlined"
                               Adornment="Adornment.End"
                               AdornmentIcon="@(_showPassword
-                                  ? Icons.Material.Filled.Visibility
-                                  : Icons.Material.Filled.VisibilityOff)"
-                              OnAdornmentClick="() => _showPassword = !_showPassword" />
+                                  ? Icons.Material.Outlined.Visibility
+                                  : Icons.Material.Outlined.VisibilityOff)"
+                              OnAdornmentClick="() => _showPassword = !_showPassword"
+                              Class="mb-5" />
             </MudForm>
-        </MudCardContent>
-        <MudCardActions Class="px-4 pb-4 d-flex flex-column gap-2">
+
             <MudButton FullWidth="true" Variant="Variant.Filled" Color="Color.Primary"
-                       Size="Size.Large" OnClick="@HandleLogin" Disabled="@_loading">
+                       Size="Size.Large" OnClick="@HandleLogin" Disabled="@_loading"
+                       Style="border-radius:10px;height:48px;font-weight:600;font-size:1rem;">
                 @if (_loading)
                 {
                     <MudProgressCircular Size="Size.Small" Indeterminate="true" Class="mr-2" />
+                    <span>Signing in…</span>
                 }
-                Sign In
+                else
+                {
+                    <span>Sign In</span>
+                }
             </MudButton>
-        </MudCardActions>
-    </MudCard>
+
+            <MudText Typo="Typo.caption" Align="Align.Center" Class="mt-6"
+                     Style="color:rgba(0,0,0,0.35);">
+                ChurchMS &copy; @DateTime.UtcNow.Year · All rights reserved
+            </MudText>
+        </div>
+    </div>
 </div>
 
 @code {

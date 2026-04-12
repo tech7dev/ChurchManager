@@ -5,44 +5,75 @@
 
 <PageTitle>Expenses — ChurchMS</PageTitle>
 
-<div class="d-flex align-center justify-space-between mb-4">
-    <MudText Typo="Typo.h4">Expenses</MudText>
-    <MudButton Variant="Variant.Filled" Color="Color.Primary"
-               StartIcon="@Icons.Material.Filled.Add"
-               Href="/expenses/new">Submit Expense</MudButton>
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(198,40,40,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.Receipt" Color="Color.Error" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Expenses</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Track and approve church spending
+            </MudText>
+        </div>
+    </div>
+    <MudButton Variant="Variant.Filled" Color="Color.Error"
+               StartIcon="@Icons.Material.Outlined.Add"
+               Href="/expenses/new"
+               Style="border-radius:10px;">Submit Expense</MudButton>
 </div>
 
-<MudTable ServerData="@ServerLoad" Dense="true" Hover="true" @ref="_table"
-          RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Primary">
-    <HeaderContent>
-        <MudTh>Title</MudTh>
-        <MudTh>Category</MudTh>
-        <MudTh>Date</MudTh>
-        <MudTh>Vendor</MudTh>
-        <MudTh>Amount</MudTh>
-        <MudTh>Status</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Title">@context.Title</MudTd>
-        <MudTd DataLabel="Category">@(context.CategoryName ?? "—")</MudTd>
-        <MudTd DataLabel="Date">@context.ExpenseDate.ToString("d")</MudTd>
-        <MudTd DataLabel="Vendor">@(context.VendorName ?? "—")</MudTd>
-        <MudTd DataLabel="Amount">
-            <MudText Style="font-weight:600">@context.Amount.ToString("N2") @context.Currency</MudText>
-        </MudTd>
-        <MudTd DataLabel="Status">
-            <MudChip T="string" Size="Size.Small" Color="@ExpenseStatusColor(context.Status)" Label="true">
-                @context.Status
-            </MudChip>
-        </MudTd>
-    </RowTemplate>
-    <NoRecordsContent>
-        <MudText Align="Align.Center" Class="pa-4">No expenses found.</MudText>
-    </NoRecordsContent>
-    <PagerContent>
-        <MudTablePager />
-    </PagerContent>
-</MudTable>
+<MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+    <MudTable ServerData="@ServerLoad" Dense="false" Hover="true" @ref="_table"
+              RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Error"
+              Elevation="0">
+        <HeaderContent>
+            <MudTh Style="font-weight:600;">Title</MudTh>
+            <MudTh Style="font-weight:600;">Category</MudTh>
+            <MudTh Style="font-weight:600;">Date</MudTh>
+            <MudTh Style="font-weight:600;">Vendor</MudTh>
+            <MudTh Style="font-weight:600;">Amount</MudTh>
+            <MudTh Style="font-weight:600;">Status</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Title">
+                <MudText Typo="Typo.body2" Style="font-weight:500;">@context.Title</MudText>
+            </MudTd>
+            <MudTd DataLabel="Category">
+                <MudText Typo="Typo.body2">@(context.CategoryName ?? "—")</MudText>
+            </MudTd>
+            <MudTd DataLabel="Date">
+                <MudText Typo="Typo.body2">@context.ExpenseDate.ToString("d")</MudText>
+            </MudTd>
+            <MudTd DataLabel="Vendor">
+                <MudText Typo="Typo.body2">@(context.VendorName ?? "—")</MudText>
+            </MudTd>
+            <MudTd DataLabel="Amount">
+                <MudText Style="font-weight:700;color:#c62828;">
+                    @context.Amount.ToString("N2") @context.Currency
+                </MudText>
+            </MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Size="Size.Small"
+                         Color="@ExpenseStatusColor(context.Status)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.Status
+                </MudChip>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <div class="d-flex flex-column align-center pa-8 gap-2">
+                <MudIcon Icon="@Icons.Material.Outlined.Receipt"
+                         Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                <MudText Color="Color.Secondary">No expenses found.</MudText>
+            </div>
+        </NoRecordsContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
 
 @code {
     private MudTable<ExpenseListItemDto> _table = null!;
@@ -66,9 +97,9 @@
     private static Color ExpenseStatusColor(string status) => status switch
     {
         "Approved" => Color.Success,
-        "Pending" => Color.Warning,
+        "Pending"  => Color.Warning,
         "Rejected" => Color.Error,
-        "Paid" => Color.Info,
-        _ => Color.Default
+        "Paid"     => Color.Info,
+        _          => Color.Default
     };
 }

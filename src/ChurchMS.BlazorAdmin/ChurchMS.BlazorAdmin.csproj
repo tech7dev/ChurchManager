@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Fluxor.Blazor.Web" Version="6.9.0" />
     <PackageReference Include="MudBlazor" Version="9.1.0" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.4.0" />
   </ItemGroup>
 
   <PropertyGroup>

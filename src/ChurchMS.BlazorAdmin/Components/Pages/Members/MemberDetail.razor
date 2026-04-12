@@ -8,69 +8,109 @@
 
 @if (_loading)
 {
-    <MudProgressLinear Color="Color.Primary" Indeterminate="true" />
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Style="border-radius:2px;" />
 }
 else if (_member is null)
 {
-    <MudAlert Severity="Severity.Error">Member not found.</MudAlert>
-    <MudButton StartIcon="@Icons.Material.Filled.ArrowBack" Href="/members" Class="mt-3">
-        Back to Members
-    </MudButton>
+    <MudAlert Severity="Severity.Error" Style="border-radius:10px;">
+        Member not found.
+    </MudAlert>
+    <MudButton StartIcon="@Icons.Material.Outlined.ArrowBack"
+               Href="/members" Class="mt-3">Back to Members</MudButton>
 }
 else
 {
-    <div class="d-flex align-center justify-space-between mb-4">
-        <div class="d-flex align-center gap-3">
-            <MudIconButton Icon="@Icons.Material.Filled.ArrowBack" Href="/members" />
-            <MudAvatar Color="Color.Primary" Size="Size.Large">
-                @_member.FirstName[0]
-            </MudAvatar>
-            <div>
-                <MudText Typo="Typo.h5">@_member.FullName</MudText>
-                <MudText Typo="Typo.body2" Color="Color.Secondary">
-                    @_member.MembershipNumber
-                </MudText>
+    <!-- Profile Header -->
+    <div class="cms-profile-header mb-5">
+        <div class="d-flex align-center justify-space-between flex-wrap gap-3">
+            <div class="d-flex align-center gap-3">
+                <MudIconButton Icon="@Icons.Material.Outlined.ArrowBack"
+                               Href="/members"
+                               Style="color:rgba(255,255,255,0.8);" />
+                <MudAvatar Color="Color.Default" Size="Size.Large"
+                           Style="background:rgba(255,255,255,0.2);color:white;
+                                  font-size:1.4rem;font-weight:700;border-radius:12px;">
+                    @_member.FirstName[0]
+                </MudAvatar>
+                <div>
+                    <MudText Typo="Typo.h5"
+                             Style="color:white;font-weight:700;line-height:1.2;">
+                        @_member.FullName
+                    </MudText>
+                    <MudText Typo="Typo.caption"
+                             Style="color:rgba(255,255,255,0.7);font-family:monospace;">
+                        @_member.MembershipNumber
+                    </MudText>
+                </div>
             </div>
-        </div>
-        <div class="d-flex gap-2">
-            <MudChip T="string" Color="@StatusColor(_member.Status)" Label="true">
-                @_member.Status
-            </MudChip>
-            <MudButton Variant="Variant.Outlined" Color="Color.Primary"
-                       StartIcon="@Icons.Material.Filled.Edit"
-                       Href="@($"/members/{Id}/edit")">Edit</MudButton>
+            <div class="d-flex align-center gap-2">
+                <MudChip T="string" Color="@StatusColor(_member.Status)" Label="true"
+                         Style="border-radius:8px;font-weight:600;">
+                    @_member.Status
+                </MudChip>
+                <MudButton Variant="Variant.Outlined"
+                           Style="color:white;border-color:rgba(255,255,255,0.5);border-radius:8px;"
+                           StartIcon="@Icons.Material.Outlined.Edit"
+                           Href="@($"/members/{Id}/edit")">Edit</MudButton>
+            </div>
         </div>
     </div>
 
-    <MudGrid>
+    <MudGrid Spacing="3">
         <MudItem xs="12" md="6">
-            <MudCard Elevation="2">
+            <MudCard Elevation="1" Style="border-radius:12px;">
                 <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudIcon Icon="@Icons.Material.Outlined.Person" Color="Color.Primary" />
+                    </CardHeaderAvatar>
                     <CardHeaderContent>
-                        <MudText Typo="Typo.subtitle1">Personal Information</MudText>
+                        <MudText Typo="Typo.subtitle1" Style="font-weight:600;">
+                            Personal Information
+                        </MudText>
                     </CardHeaderContent>
                 </MudCardHeader>
+                <MudDivider />
                 <MudCardContent>
                     <MudGrid>
                         <MudItem xs="6">
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">Gender</MudText>
-                            <MudText>@(_member.Gender?.ToString() ?? "—")</MudText>
+                            <div class="cms-detail-item">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">Gender</MudText>
+                                <MudText Typo="Typo.body2" Style="font-weight:500;">
+                                    @(_member.Gender?.ToString() ?? "—")
+                                </MudText>
+                            </div>
                         </MudItem>
                         <MudItem xs="6">
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">Date of Birth</MudText>
-                            <MudText>@(_member.DateOfBirth?.ToString("d") ?? "—")</MudText>
+                            <div class="cms-detail-item">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">Date of Birth</MudText>
+                                <MudText Typo="Typo.body2" Style="font-weight:500;">
+                                    @(_member.DateOfBirth?.ToString("d") ?? "—")
+                                </MudText>
+                            </div>
                         </MudItem>
                         <MudItem xs="6">
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">Marital Status</MudText>
-                            <MudText>@(_member.MaritalStatus?.ToString() ?? "—")</MudText>
+                            <div class="cms-detail-item">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">Marital Status</MudText>
+                                <MudText Typo="Typo.body2" Style="font-weight:500;">
+                                    @(_member.MaritalStatus?.ToString() ?? "—")
+                                </MudText>
+                            </div>
                         </MudItem>
                         <MudItem xs="6">
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">Blood Type</MudText>
-                            <MudText>@(_member.BloodType?.ToString() ?? "—")</MudText>
+                            <div class="cms-detail-item">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">Blood Type</MudText>
+                                <MudText Typo="Typo.body2" Style="font-weight:500;">
+                                    @(_member.BloodType?.ToString() ?? "—")
+                                </MudText>
+                            </div>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">Occupation</MudText>
-                            <MudText>@(_member.Occupation ?? "—")</MudText>
+                            <div class="cms-detail-item">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">Occupation</MudText>
+                                <MudText Typo="Typo.body2" Style="font-weight:500;">
+                                    @(_member.Occupation ?? "—")
+                                </MudText>
+                            </div>
                         </MudItem>
                     </MudGrid>
                 </MudCardContent>
@@ -78,27 +118,45 @@ else
         </MudItem>
 
         <MudItem xs="12" md="6">
-            <MudCard Elevation="2">
+            <MudCard Elevation="1" Style="border-radius:12px;">
                 <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudIcon Icon="@Icons.Material.Outlined.ContactPhone" Color="Color.Info" />
+                    </CardHeaderAvatar>
                     <CardHeaderContent>
-                        <MudText Typo="Typo.subtitle1">Contact</MudText>
+                        <MudText Typo="Typo.subtitle1" Style="font-weight:600;">
+                            Contact Details
+                        </MudText>
                     </CardHeaderContent>
                 </MudCardHeader>
+                <MudDivider />
                 <MudCardContent>
                     <MudGrid>
                         <MudItem xs="6">
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">Phone</MudText>
-                            <MudText>@(_member.Phone ?? "—")</MudText>
+                            <div class="cms-detail-item">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">Phone</MudText>
+                                <MudText Typo="Typo.body2" Style="font-weight:500;">
+                                    @(_member.Phone ?? "—")
+                                </MudText>
+                            </div>
                         </MudItem>
                         <MudItem xs="6">
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">Email</MudText>
-                            <MudText>@(_member.Email ?? "—")</MudText>
+                            <div class="cms-detail-item">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">Email</MudText>
+                                <MudText Typo="Typo.body2" Style="font-weight:500;">
+                                    @(_member.Email ?? "—")
+                                </MudText>
+                            </div>
                         </MudItem>
                         <MudItem xs="12">
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">Address</MudText>
-                            <MudText>@(string.Join(", ",
-                                new[]{ _member.Address, _member.City, _member.State, _member.Country }
-                                .Where(s => !string.IsNullOrWhiteSpace(s))))</MudText>
+                            <div class="cms-detail-item">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">Address</MudText>
+                                <MudText Typo="Typo.body2" Style="font-weight:500;">
+                                    @(string.Join(", ",
+                                        new[]{ _member.Address, _member.City, _member.State, _member.Country }
+                                        .Where(s => !string.IsNullOrWhiteSpace(s))))
+                                </MudText>
+                            </div>
                         </MudItem>
                     </MudGrid>
                 </MudCardContent>
@@ -106,29 +164,51 @@ else
         </MudItem>
 
         <MudItem xs="12" md="6">
-            <MudCard Elevation="2">
+            <MudCard Elevation="1" Style="border-radius:12px;">
                 <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudIcon Icon="@Icons.Material.Outlined.Church" Color="Color.Success" />
+                    </CardHeaderAvatar>
                     <CardHeaderContent>
-                        <MudText Typo="Typo.subtitle1">Church Membership</MudText>
+                        <MudText Typo="Typo.subtitle1" Style="font-weight:600;">
+                            Church Membership
+                        </MudText>
                     </CardHeaderContent>
                 </MudCardHeader>
+                <MudDivider />
                 <MudCardContent>
                     <MudGrid>
                         <MudItem xs="6">
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">Join Date</MudText>
-                            <MudText>@(_member.JoinDate?.ToString("d") ?? "—")</MudText>
+                            <div class="cms-detail-item">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">Join Date</MudText>
+                                <MudText Typo="Typo.body2" Style="font-weight:500;">
+                                    @(_member.JoinDate?.ToString("d") ?? "—")
+                                </MudText>
+                            </div>
                         </MudItem>
                         <MudItem xs="6">
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">Baptism Date</MudText>
-                            <MudText>@(_member.BaptismDate?.ToString("d") ?? "—")</MudText>
+                            <div class="cms-detail-item">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">Baptism Date</MudText>
+                                <MudText Typo="Typo.body2" Style="font-weight:500;">
+                                    @(_member.BaptismDate?.ToString("d") ?? "—")
+                                </MudText>
+                            </div>
                         </MudItem>
                         <MudItem xs="6">
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">Family</MudText>
-                            <MudText>@(_member.FamilyName ?? "—")</MudText>
+                            <div class="cms-detail-item">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">Family</MudText>
+                                <MudText Typo="Typo.body2" Style="font-weight:500;">
+                                    @(_member.FamilyName ?? "—")
+                                </MudText>
+                            </div>
                         </MudItem>
                         <MudItem xs="6">
-                            <MudText Typo="Typo.caption" Color="Color.Secondary">Family Role</MudText>
-                            <MudText>@(_member.FamilyRole?.ToString() ?? "—")</MudText>
+                            <div class="cms-detail-item">
+                                <MudText Typo="Typo.caption" Color="Color.Secondary">Family Role</MudText>
+                                <MudText Typo="Typo.body2" Style="font-weight:500;">
+                                    @(_member.FamilyRole?.ToString() ?? "—")
+                                </MudText>
+                            </div>
                         </MudItem>
                     </MudGrid>
                 </MudCardContent>
@@ -138,14 +218,18 @@ else
         @if (!string.IsNullOrWhiteSpace(_member.Notes))
         {
             <MudItem xs="12" md="6">
-                <MudCard Elevation="2">
+                <MudCard Elevation="1" Style="border-radius:12px;">
                     <MudCardHeader>
+                        <CardHeaderAvatar>
+                            <MudIcon Icon="@Icons.Material.Outlined.Notes" Color="Color.Warning" />
+                        </CardHeaderAvatar>
                         <CardHeaderContent>
-                            <MudText Typo="Typo.subtitle1">Notes</MudText>
+                            <MudText Typo="Typo.subtitle1" Style="font-weight:600;">Notes</MudText>
                         </CardHeaderContent>
                     </MudCardHeader>
+                    <MudDivider />
                     <MudCardContent>
-                        <MudText>@_member.Notes</MudText>
+                        <MudText Typo="Typo.body2">@_member.Notes</MudText>
                     </MudCardContent>
                 </MudCard>
             </MudItem>
@@ -178,9 +262,9 @@ else
 
     private static Color StatusColor(MemberStatus status) => status switch
     {
-        MemberStatus.Active => Color.Success,
-        MemberStatus.Inactive => Color.Default,
-        MemberStatus.Deceased => Color.Dark,
+        MemberStatus.Active     => Color.Success,
+        MemberStatus.Inactive   => Color.Default,
+        MemberStatus.Deceased   => Color.Dark,
         MemberStatus.Transferred => Color.Warning,
         _ => Color.Default
     };

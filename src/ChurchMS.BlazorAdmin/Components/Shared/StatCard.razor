@@ -1,18 +1,28 @@
-<MudCard Elevation="2" Class="h-100">
-    <MudCardContent Class="d-flex align-center gap-4 pa-4">
-        <MudAvatar Color="@Color" Variant="Variant.Filled" Size="Size.Large">
+<div class="cms-stat-card mud-paper mud-elevation-2 h-100"
+     style="border-radius:12px;overflow:hidden;background:white;">
+    <div class="cms-stat-accent" style="background:@_accentColor;"></div>
+    <div class="d-flex align-center gap-4 pa-4">
+        <MudAvatar Color="@Color" Variant="Variant.Filled" Size="Size.Large"
+                   Style="border-radius:12px;flex-shrink:0;">
             <MudIcon Icon="@Icon" />
         </MudAvatar>
-        <div>
-            <MudText Typo="Typo.h5" Class="mb-0">@Value</MudText>
-            <MudText Typo="Typo.subtitle2" Color="Color.Secondary">@Title</MudText>
+        <div style="min-width:0;flex:1;">
+            <MudText Typo="Typo.caption" Style="color:rgba(0,0,0,0.55);font-weight:500;
+                     text-transform:uppercase;letter-spacing:0.06em;">
+                @Title
+            </MudText>
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;margin:2px 0;">
+                @Value
+            </MudText>
             @if (!string.IsNullOrWhiteSpace(SubTitle))
             {
-                <MudText Typo="Typo.caption" Color="Color.Tertiary">@SubTitle</MudText>
+                <MudText Typo="Typo.caption" Style="color:rgba(0,0,0,0.45);">
+                    @SubTitle
+                </MudText>
             }
         </div>
-    </MudCardContent>
-</MudCard>
+    </div>
+</div>
 
 @code {
     [Parameter] public string Title { get; set; } = string.Empty;
@@ -20,4 +30,16 @@
     [Parameter] public string? SubTitle { get; set; }
     [Parameter] public string Icon { get; set; } = Icons.Material.Filled.Dashboard;
     [Parameter] public Color Color { get; set; } = Color.Primary;
+
+    private string _accentColor => Color switch
+    {
+        Color.Primary   => "#1565C0",
+        Color.Secondary => "#546E7A",
+        Color.Success   => "#2e7d32",
+        Color.Error     => "#c62828",
+        Color.Warning   => "#e65100",
+        Color.Info      => "#01579b",
+        Color.Dark      => "#212121",
+        _               => "#1565C0"
+    };
 }

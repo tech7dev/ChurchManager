@@ -5,109 +5,181 @@
 
 <PageTitle>Dashboard — ChurchMS</PageTitle>
 
-<MudText Typo="Typo.h4" GutterBottom="true">Dashboard</MudText>
-<MudText Typo="Typo.body1" Color="Color.Secondary" Class="mb-6">
-    Church overview at a glance
-</MudText>
+<!-- Welcome banner -->
+<MudPaper Elevation="0" Class="mb-5 pa-5"
+          Style="background:linear-gradient(135deg,#1565C0 0%,#1976D2 60%,#42A5F5 100%);
+                 border-radius:16px;color:white;">
+    <div class="d-flex align-center justify-space-between flex-wrap gap-3">
+        <div>
+            <MudText Typo="Typo.h5" Style="color:white;font-weight:700;margin-bottom:4px;">
+                Good @_greeting, welcome back!
+            </MudText>
+            <MudText Typo="Typo.body2" Style="color:rgba(255,255,255,0.8);">
+                Here's what's happening across your church today — @DateTime.Now.ToString("dddd, MMMM d, yyyy")
+            </MudText>
+        </div>
+        <MudButton Variant="Variant.Outlined"
+                   Style="color:white;border-color:rgba(255,255,255,0.5);border-radius:8px;"
+                   StartIcon="@Icons.Material.Outlined.Refresh"
+                   OnClick="@RefreshAsync"
+                   Disabled="@_loading">
+            Refresh
+        </MudButton>
+    </div>
+</MudPaper>
 
 @if (_loading)
 {
-    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mb-4" />
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="mb-4"
+                       Style="border-radius:2px;" />
 }
 
 @if (_data is not null)
 {
-    <!-- Members & People -->
-    <MudText Typo="Typo.subtitle1" Class="mb-2 mt-2">People</MudText>
-    <MudGrid Spacing="3" Class="mb-4">
+    <!-- People Section -->
+    <div class="cms-section-header">
+        <MudIcon Icon="@Icons.Material.Outlined.People" Color="Color.Primary" Size="Size.Small" />
+        <MudText Typo="Typo.subtitle1" Style="font-weight:600;">People</MudText>
+    </div>
+    <MudGrid Spacing="3" Class="mb-5">
         <MudItem xs="12" sm="6" md="3">
             <StatCard Title="Total Members" Value="@_data.TotalMembers.ToString("N0")"
                       SubTitle="@($"{_data.ActiveMembers:N0} active")"
-                      Icon="@Icons.Material.Filled.People" Color="Color.Primary" />
+                      Icon="@Icons.Material.Outlined.People" Color="Color.Primary" />
         </MudItem>
         <MudItem xs="12" sm="6" md="3">
             <StatCard Title="New This Month" Value="@_data.NewMembersThisMonth.ToString("N0")"
-                      SubTitle="New members"
-                      Icon="@Icons.Material.Filled.PersonAdd" Color="Color.Success" />
+                      SubTitle="New registrations"
+                      Icon="@Icons.Material.Outlined.PersonAdd" Color="Color.Success" />
         </MudItem>
         <MudItem xs="12" sm="6" md="3">
             <StatCard Title="Families" Value="@_data.TotalFamilies.ToString("N0")"
                       SubTitle="Registered families"
-                      Icon="@Icons.Material.Filled.FamilyRestroom" Color="Color.Info" />
+                      Icon="@Icons.Material.Outlined.FamilyRestroom" Color="Color.Info" />
         </MudItem>
         <MudItem xs="12" sm="6" md="3">
             <StatCard Title="Visitors" Value="@_data.TotalVisitors.ToString("N0")"
                       SubTitle="Total visitors"
-                      Icon="@Icons.Material.Filled.PersonSearch" Color="Color.Warning" />
+                      Icon="@Icons.Material.Outlined.PersonSearch" Color="Color.Warning" />
         </MudItem>
     </MudGrid>
 
-    <!-- Finance -->
-    <MudText Typo="Typo.subtitle1" Class="mb-2">Finance</MudText>
-    <MudGrid Spacing="3" Class="mb-4">
+    <!-- Finance Section -->
+    <div class="cms-section-header">
+        <MudIcon Icon="@Icons.Material.Outlined.AccountBalance" Color="Color.Success" Size="Size.Small" />
+        <MudText Typo="Typo.subtitle1" Style="font-weight:600;">Finance</MudText>
+    </div>
+    <MudGrid Spacing="3" Class="mb-5">
         <MudItem xs="12" sm="6" md="4">
-            <StatCard Title="Contributions (Month)" Value="@_data.ContributionsThisMonth.ToString("N2")"
-                      SubTitle="@($"Year: {_data.ContributionsThisYear:N2}")"
-                      Icon="@Icons.Material.Filled.Payments" Color="Color.Success" />
+            <StatCard Title="Contributions This Month"
+                      Value="@_data.ContributionsThisMonth.ToString("N2")"
+                      SubTitle="@($"Year total: {_data.ContributionsThisYear:N2}")"
+                      Icon="@Icons.Material.Outlined.Payments" Color="Color.Success" />
         </MudItem>
         <MudItem xs="12" sm="6" md="4">
-            <StatCard Title="Expenses (Month)" Value="@_data.ExpensesThisMonth.ToString("N2")"
-                      SubTitle="Current month expenses"
-                      Icon="@Icons.Material.Filled.Receipt" Color="Color.Error" />
+            <StatCard Title="Expenses This Month"
+                      Value="@_data.ExpensesThisMonth.ToString("N2")"
+                      SubTitle="Current month spending"
+                      Icon="@Icons.Material.Outlined.Receipt" Color="Color.Error" />
         </MudItem>
         <MudItem xs="12" sm="6" md="4">
             <StatCard Title="Departments" Value="@_data.TotalDepartments.ToString("N0")"
                       SubTitle="Active departments"
-                      Icon="@Icons.Material.Filled.Groups" Color="Color.Secondary" />
+                      Icon="@Icons.Material.Outlined.Groups" Color="Color.Secondary" />
         </MudItem>
     </MudGrid>
 
-    <!-- Events -->
-    <MudText Typo="Typo.subtitle1" Class="mb-2">Events</MudText>
-    <MudGrid Spacing="3" Class="mb-4">
+    <!-- Events Section -->
+    <div class="cms-section-header">
+        <MudIcon Icon="@Icons.Material.Outlined.Event" Color="Color.Info" Size="Size.Small" />
+        <MudText Typo="Typo.subtitle1" Style="font-weight:600;">Events &amp; Operations</MudText>
+    </div>
+    <MudGrid Spacing="3" Class="mb-5">
         <MudItem xs="12" sm="6" md="4">
             <StatCard Title="Upcoming Events" Value="@_data.UpcomingEventsCount.ToString("N0")"
-                      SubTitle="@($"{_data.EventsThisMonth} this month")"
-                      Icon="@Icons.Material.Filled.Event" Color="Color.Info" />
+                      SubTitle="@($"{_data.EventsThisMonth} scheduled this month")"
+                      Icon="@Icons.Material.Outlined.Event" Color="Color.Info" />
         </MudItem>
         <MudItem xs="12" sm="6" md="4">
             <StatCard Title="SMS Credits" Value="@_data.SmsCreditBalance.ToString("N0")"
-                      SubTitle="Available credits"
-                      Icon="@Icons.Material.Filled.Sms" Color="Color.Primary" />
+                      SubTitle="Available balance"
+                      Icon="@Icons.Material.Outlined.Sms" Color="Color.Primary" />
         </MudItem>
         <MudItem xs="12" sm="6" md="4">
-            <StatCard Title="Open Tickets" Value="@_data.OpenSupportTickets.ToString("N0")"
-                      SubTitle="Support tickets pending"
-                      Icon="@Icons.Material.Filled.ConfirmationNumber" Color="Color.Warning" />
+            <StatCard Title="Open Support Tickets" Value="@_data.OpenSupportTickets.ToString("N0")"
+                      SubTitle="Pending resolution"
+                      Icon="@Icons.Material.Outlined.ConfirmationNumber" Color="Color.Warning" />
         </MudItem>
     </MudGrid>
 
-    <!-- Subscription status -->
+    <!-- Subscription banner -->
+    <MudCard Elevation="0" Class="@($"cms-subscription-banner {(_data.HasActiveSubscription ? "active" : "inactive")}")"
+             Style="background:white;">
+        <MudCardContent Class="d-flex align-center gap-3 py-3">
+            <MudIcon Icon="@(_data.HasActiveSubscription
+                            ? Icons.Material.Filled.CheckCircle
+                            : Icons.Material.Filled.Warning)"
+                     Color="@(_data.HasActiveSubscription ? Color.Success : Color.Error)"
+                     Size="Size.Medium" />
+            <div style="flex:1;">
+                <MudText Typo="Typo.subtitle2" Style="font-weight:600;">
+                    Subscription — @(_data.HasActiveSubscription ? "Active" : "Inactive")
+                </MudText>
+                <MudText Typo="Typo.caption" Color="Color.Secondary">
+                    @(_data.HasActiveSubscription
+                        ? $"Plan: {_data.ActiveSubscriptionPlan}"
+                        : "No active subscription. Renew to continue using all features.")
+                </MudText>
+            </div>
+            @if (!_data.HasActiveSubscription)
+            {
+                <MudButton Variant="Variant.Filled" Color="Color.Primary"
+                           Size="Size.Small" Href="/subscriptions"
+                           Style="border-radius:8px;">Manage</MudButton>
+            }
+        </MudCardContent>
+    </MudCard>
+
+    <!-- Quick Actions -->
+    <MudText Typo="Typo.subtitle1" Class="mt-5 mb-3" Style="font-weight:600;">
+        Quick Actions
+    </MudText>
     <MudGrid Spacing="3">
-        <MudItem xs="12">
-            <MudCard Elevation="2">
-                <MudCardContent Class="d-flex align-center gap-3">
-                    <MudIcon Icon="@(_data.HasActiveSubscription
-                                    ? Icons.Material.Filled.CheckCircle
-                                    : Icons.Material.Filled.Error)"
-                             Color="@(_data.HasActiveSubscription ? Color.Success : Color.Error)"
-                             Size="Size.Large" />
-                    <div>
-                        <MudText Typo="Typo.subtitle1">Subscription Status</MudText>
-                        <MudText Typo="Typo.body2" Color="Color.Secondary">
-                            @(_data.HasActiveSubscription
-                                ? $"Active — Plan: {_data.ActiveSubscriptionPlan}"
-                                : "No active subscription. Please renew to continue using all features.")
-                        </MudText>
-                    </div>
-                    @if (!_data.HasActiveSubscription)
-                    {
-                        <MudSpacer />
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary"
-                                   Href="/subscriptions">Manage Subscription</MudButton>
-                    }
-                </MudCardContent>
-            </MudCard>
+        <MudItem xs="6" sm="4" md="2">
+            <a href="/members/new" class="cms-quick-action">
+                <MudIcon Icon="@Icons.Material.Outlined.PersonAdd" Color="Color.Primary" />
+                <MudText Typo="Typo.caption" Align="Align.Center">Add Member</MudText>
+            </a>
+        </MudItem>
+        <MudItem xs="6" sm="4" md="2">
+            <a href="/contributions/new" class="cms-quick-action">
+                <MudIcon Icon="@Icons.Material.Outlined.Payments" Color="Color.Success" />
+                <MudText Typo="Typo.caption" Align="Align.Center">Record Giving</MudText>
+            </a>
+        </MudItem>
+        <MudItem xs="6" sm="4" md="2">
+            <a href="/events/new" class="cms-quick-action">
+                <MudIcon Icon="@Icons.Material.Outlined.Event" Color="Color.Info" />
+                <MudText Typo="Typo.caption" Align="Align.Center">New Event</MudText>
+            </a>
+        </MudItem>
+        <MudItem xs="6" sm="4" md="2">
+            <a href="/expenses/new" class="cms-quick-action">
+                <MudIcon Icon="@Icons.Material.Outlined.Receipt" Color="Color.Warning" />
+                <MudText Typo="Typo.caption" Align="Align.Center">Submit Expense</MudText>
+            </a>
+        </MudItem>
+        <MudItem xs="6" sm="4" md="2">
+            <a href="/reports/financial" class="cms-quick-action">
+                <MudIcon Icon="@Icons.Material.Outlined.BarChart" Color="Color.Secondary" />
+                <MudText Typo="Typo.caption" Align="Align.Center">Financial Report</MudText>
+            </a>
+        </MudItem>
+        <MudItem xs="6" sm="4" md="2">
+            <a href="/messaging/campaigns" class="cms-quick-action">
+                <MudIcon Icon="@Icons.Material.Outlined.Campaign" Color="Color.Primary" />
+                <MudText Typo="Typo.caption" Align="Align.Center">Send Message</MudText>
+            </a>
         </MudItem>
     </MudGrid>
 }
@@ -116,8 +188,21 @@
     private DashboardSummaryDto? _data;
     private bool _loading = true;
 
-    protected override async Task OnInitializedAsync()
+    private static string _greeting => DateTime.Now.Hour switch
     {
+        < 12 => "morning",
+        < 17 => "afternoon",
+        _    => "evening"
+    };
+
+    protected override async Task OnInitializedAsync() => await LoadAsync();
+
+    private async Task RefreshAsync() => await LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        _loading = true;
+        StateHasChanged();
         try
         {
             _data = await ReportService.GetDashboardAsync();

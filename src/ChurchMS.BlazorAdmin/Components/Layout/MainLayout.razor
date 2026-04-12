@@ -1,8 +1,8 @@
-﻿@inherits LayoutComponentBase
+@inherits LayoutComponentBase
 @inject NavigationManager Navigation
 @inject IAuthService AuthService
 
-<MudThemeProvider />
+<MudThemeProvider Theme="_theme" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -12,32 +12,58 @@
 <AuthorizeView>
     <Authorized>
         <MudLayout>
-            <MudAppBar Elevation="1" Color="Color.Primary" Dense="true">
+            <MudAppBar Elevation="0" Color="Color.Surface"
+                       Style="border-bottom:1px solid rgba(0,0,0,0.08);">
                 <MudIconButton Icon="@Icons.Material.Filled.Menu"
-                               Color="Color.Inherit" Edge="Edge.Start"
+                               Color="Color.Default" Edge="Edge.Start"
                                OnClick="@ToggleDrawer" />
-                <MudText Typo="Typo.h6" Class="ml-2">ChurchMS Admin</MudText>
+                <MudText Typo="Typo.h6" Class="ml-1"
+                         Style="font-weight:700;color:#1565C0;">ChurchMS</MudText>
+                <MudText Typo="Typo.body2" Class="ml-1"
+                         Style="color:rgba(0,0,0,0.38);font-weight:400;">Admin</MudText>
                 <MudSpacer />
-                <MudText Typo="Typo.body2" Class="mr-2">
-                    @context.User.FindFirst("name")?.Value
-                </MudText>
-                <MudIconButton Icon="@Icons.Material.Filled.Logout"
-                               Color="Color.Inherit" OnClick="@Logout"
-                               Title="Logout" />
+                <MudIconButton Icon="@Icons.Material.Outlined.Notifications"
+                               Color="Color.Default" Class="mr-1" />
+                <MudMenu Dense="true" AnchorOrigin="Origin.BottomRight"
+                         TransformOrigin="Origin.TopRight">
+                    <ActivatorContent Context="menuCtx">
+                        <MudAvatar Color="Color.Primary" Size="Size.Small"
+                                   Style="cursor:pointer;font-size:0.85rem;font-weight:600;">
+                            @GetInitials(context.User)
+                        </MudAvatar>
+                    </ActivatorContent>
+                    <ChildContent>
+                        <MudMenuItem Icon="@Icons.Material.Outlined.Person">Profile</MudMenuItem>
+                        <MudMenuItem Icon="@Icons.Material.Outlined.Settings">Settings</MudMenuItem>
+                        <MudDivider />
+                        <MudMenuItem Icon="@Icons.Material.Outlined.Logout"
+                                     OnClick="@Logout">Sign Out</MudMenuItem>
+                    </ChildContent>
+                </MudMenu>
             </MudAppBar>
 
             <MudDrawer @bind-Open="_drawerOpen" ClipMode="DrawerClipMode.Always"
-                       Elevation="2" Variant="DrawerVariant.Responsive">
-                <MudDrawerHeader>
-                    <MudText Typo="Typo.subtitle2" Color="Color.Primary" Class="pt-2">
-                        Church Management
-                    </MudText>
-                </MudDrawerHeader>
+                       Elevation="0" Variant="DrawerVariant.Responsive"
+                       Style="border-right:1px solid rgba(0,0,0,0.08);background:#fff;">
+                <div class="cms-drawer-brand">
+                    <div class="cms-drawer-brand-icon">
+                        <MudIcon Icon="@Icons.Material.Filled.Church"
+                                 Style="color:white;" Size="Size.Small" />
+                    </div>
+                    <div>
+                        <MudText Typo="Typo.subtitle2"
+                                 Style="font-weight:700;line-height:1.2;">ChurchMS</MudText>
+                        <MudText Typo="Typo.caption"
+                                 Style="color:rgba(0,0,0,0.45);line-height:1.2;">
+                            @GetUserName(context.User)
+                        </MudText>
+                    </div>
+                </div>
                 <NavMenu />
             </MudDrawer>
 
-            <MudMainContent>
-                <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="py-4">
+            <MudMainContent Style="background:#f5f5f5;">
+                <MudContainer MaxWidth="MaxWidth.ExtraExtraLarge" Class="py-5 px-4">
                     @Body
                 </MudContainer>
             </MudMainContent>
@@ -59,6 +85,31 @@
     private bool _drawerOpen = true;
     private bool _initialized;
 
+    private readonly MudTheme _theme = new()
+    {
+        PaletteLight = new PaletteLight
+        {
+            Primary = "#1565C0",
+            PrimaryDarken = "#0D47A1",
+            PrimaryLighten = "#1976D2",
+            Secondary = "#546E7A",
+            AppbarBackground = "#ffffff",
+            AppbarText = "#212121",
+            Background = "#f5f5f5",
+            Surface = "#ffffff",
+            DrawerBackground = "#ffffff",
+            DrawerText = "#212121",
+        },
+        Typography = new Typography
+        {
+            Default = new DefaultTypography { FontFamily = ["Roboto", "Helvetica", "Arial", "sans-serif"] },
+            H4 = new H4Typography { FontWeight = "700" },
+            H5 = new H5Typography { FontWeight = "600" },
+            H6 = new H6Typography { FontWeight = "600" },
+            Subtitle1 = new Subtitle1Typography { FontWeight = "600" },
+        }
+    };
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
@@ -67,6 +118,20 @@
             StateHasChanged();
         }
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private static string GetUserName(System.Security.Claims.ClaimsPrincipal user)
+        => user.FindFirst("name")?.Value
+           ?? user.FindFirst(System.Security.Claims.ClaimTypes.Email)?.Value
+           ?? "User";
+
+    private static string GetInitials(System.Security.Claims.ClaimsPrincipal user)
+    {
+        var name = GetUserName(user);
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        return parts.Length >= 2
+            ? $"{parts[0][0]}{parts[^1][0]}".ToUpper()
+            : name.Length >= 2 ? name[..2].ToUpper() : name.ToUpper();
     }
 
     private void ToggleDrawer() => _drawerOpen = !_drawerOpen;

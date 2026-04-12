@@ -2,79 +2,115 @@
 @attribute [Authorize]
 @inject MemberService MemberService
 @inject NavigationManager Navigation
-@inject IDialogService DialogService
+@inject IJSRuntime JS
 @inject ISnackbar Snackbar
 
 <PageTitle>Members — ChurchMS</PageTitle>
 
-<div class="d-flex align-center justify-space-between mb-4">
-    <MudText Typo="Typo.h4">Members</MudText>
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(21,101,192,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.People" Color="Color.Primary" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Members</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Manage church members and their details
+            </MudText>
+        </div>
+    </div>
     <MudButton Variant="Variant.Filled" Color="Color.Primary"
-               StartIcon="@Icons.Material.Filled.PersonAdd"
-               Href="/members/new">Add Member</MudButton>
+               StartIcon="@Icons.Material.Outlined.PersonAdd"
+               Href="/members/new"
+               Style="border-radius:10px;">Add Member</MudButton>
 </div>
 
-<MudPaper Class="mb-4 pa-3" Elevation="1">
+<MudPaper Class="mb-4 pa-3 cms-search-bar" Elevation="1">
     <MudTextField T="string" @bind-Value="_search"
-                  Label="Search by name, phone, email or membership number..."
-                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search"
-                  Immediate="false" DebounceInterval="400"
+                  Label="Search by name, phone, email or membership number…"
+                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search"
+                  Immediate="false" DebounceInterval="400" Variant="Variant.Outlined"
                   OnDebounceIntervalElapsed="@(_ => _table.ReloadServerData())"
-                  Clearable="true" OnClearButtonClick="@(() => { _search = string.Empty; _table.ReloadServerData(); })" />
+                  Clearable="true"
+                  OnClearButtonClick="@(() => { _search = string.Empty; _table.ReloadServerData(); })" />
 </MudPaper>
 
-<MudTable ServerData="@ServerLoad" Dense="true" Hover="true" @ref="_table"
-          RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Primary"
-          OnRowClick="@(row => Navigation.NavigateTo($"/members/{row.Item.Id}"))">
-    <HeaderContent>
-        <MudTh>No.</MudTh>
-        <MudTh>Name</MudTh>
-        <MudTh>Phone</MudTh>
-        <MudTh>Email</MudTh>
-        <MudTh>Status</MudTh>
-        <MudTh>Joined</MudTh>
-        <MudTh Style="width:100px">Actions</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="No.">
-            <MudText Typo="Typo.body2">@context.MembershipNumber</MudText>
-        </MudTd>
-        <MudTd DataLabel="Name">
-            <div class="d-flex align-center gap-2">
-                <MudAvatar Size="Size.Small" Color="Color.Primary">
-                    @context.FirstName[0]
-                </MudAvatar>
-                <MudText>@context.FullName</MudText>
+<MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+    <MudTable ServerData="@ServerLoad" Dense="false" Hover="true" @ref="_table"
+              RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Primary"
+              Elevation="0"
+              OnRowClick="@((TableRowClickEventArgs<MemberListDto> row) => Navigation.NavigateTo($"/members/{row.Item.Id}"))">
+        <HeaderContent>
+            <MudTh Style="font-weight:600;">No.</MudTh>
+            <MudTh Style="font-weight:600;">Name</MudTh>
+            <MudTh Style="font-weight:600;">Phone</MudTh>
+            <MudTh Style="font-weight:600;">Email</MudTh>
+            <MudTh Style="font-weight:600;">Status</MudTh>
+            <MudTh Style="font-weight:600;">Joined</MudTh>
+            <MudTh Style="width:100px;font-weight:600;"></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="No.">
+                <MudText Typo="Typo.caption"
+                         Style="font-family:monospace;color:rgba(0,0,0,0.55);">
+                    @context.MembershipNumber
+                </MudText>
+            </MudTd>
+            <MudTd DataLabel="Name">
+                <div class="d-flex align-center gap-2">
+                    <MudAvatar Size="Size.Small" Color="Color.Primary"
+                               Style="border-radius:8px;font-size:0.8rem;font-weight:600;">
+                        @context.FirstName[0]
+                    </MudAvatar>
+                    <MudText Style="font-weight:500;">@context.FullName</MudText>
+                </div>
+            </MudTd>
+            <MudTd DataLabel="Phone">
+                <MudText Typo="Typo.body2">@context.Phone</MudText>
+            </MudTd>
+            <MudTd DataLabel="Email">
+                <MudText Typo="Typo.body2">@context.Email</MudText>
+            </MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.Status
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Joined">
+                <MudText Typo="Typo.body2">@context.JoinDate?.ToString("d")</MudText>
+            </MudTd>
+            <MudTd>
+                <span @onclick:stopPropagation="true">
+                    <MudTooltip Text="Edit">
+                        <MudIconButton Icon="@Icons.Material.Outlined.Edit" Size="Size.Small"
+                                       Color="Color.Default"
+                                       OnClick="@(() => Navigation.NavigateTo($"/members/{context.Id}/edit"))" />
+                    </MudTooltip>
+                    <MudTooltip Text="Remove">
+                        <MudIconButton Icon="@Icons.Material.Outlined.DeleteOutline" Size="Size.Small"
+                                       Color="Color.Error"
+                                       OnClick="@(() => DeleteAsync(context.Id, context.FullName))" />
+                    </MudTooltip>
+                </span>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <div class="d-flex flex-column align-center pa-8 gap-2">
+                <MudIcon Icon="@Icons.Material.Outlined.PeopleAlt"
+                         Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                <MudText Color="Color.Secondary">No members found.</MudText>
             </div>
-        </MudTd>
-        <MudTd DataLabel="Phone">@context.Phone</MudTd>
-        <MudTd DataLabel="Email">@context.Email</MudTd>
-        <MudTd DataLabel="Status">
-            <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)" Label="true">
-                @context.Status
-            </MudChip>
-        </MudTd>
-        <MudTd DataLabel="Joined">@context.JoinDate?.ToString("d")</MudTd>
-        <MudTd>
-            <MudIconButton Icon="@Icons.Material.Filled.Edit" Size="Size.Small"
-                           OnClick="@(() => Navigation.NavigateTo($"/members/{context.Id}/edit"))"
-                           @onclick:stopPropagation="true" />
-            <MudIconButton Icon="@Icons.Material.Filled.DeleteOutline" Size="Size.Small"
-                           Color="Color.Error"
-                           OnClick="@(() => DeleteAsync(context.Id, context.FullName))"
-                           @onclick:stopPropagation="true" />
-        </MudTd>
-    </RowTemplate>
-    <NoRecordsContent>
-        <MudText Align="Align.Center" Class="pa-4">No members found.</MudText>
-    </NoRecordsContent>
-    <LoadingContent>
-        <MudText Align="Align.Center" Class="pa-4">Loading...</MudText>
-    </LoadingContent>
-    <PagerContent>
-        <MudTablePager />
-    </PagerContent>
-</MudTable>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText Align="Align.Center" Class="pa-4" Color="Color.Secondary">Loading…</MudText>
+        </LoadingContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
 
 @code {
     private MudTable<MemberListDto> _table = null!;
@@ -99,20 +135,18 @@
 
     private static Color StatusColor(MemberStatus status) => status switch
     {
-        MemberStatus.Active => Color.Success,
-        MemberStatus.Inactive => Color.Default,
-        MemberStatus.Deceased => Color.Dark,
+        MemberStatus.Active     => Color.Success,
+        MemberStatus.Inactive   => Color.Default,
+        MemberStatus.Deceased   => Color.Dark,
         MemberStatus.Transferred => Color.Warning,
         _ => Color.Default
     };
 
     private async Task DeleteAsync(Guid id, string name)
     {
-        var ok = await DialogService.ShowMessageBox(
-            "Confirm Removal",
-            $"Remove {name} from the member list?",
-            yesText: "Remove", cancelText: "Cancel");
-        if (ok != true) return;
+        var confirmed = await JS.InvokeAsync<bool>("confirm",
+            $"Remove {name} from the member list?");
+        if (!confirmed) return;
 
         if (await MemberService.DeleteAsync(id))
         {
