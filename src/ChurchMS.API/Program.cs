@@ -121,6 +121,10 @@ builder.Services.AddSwaggerGen(options =>
             { scheme, new List<string>() }
         };
     });
+
+    // Use fully-qualified class names as schema IDs to avoid conflicts
+    // (e.g. Evangelism.CreateCampaignCommand vs Contributions.CreateCampaignCommand)
+    options.CustomSchemaIds(type => type.FullName);
 });
 
 // CORS
@@ -142,11 +146,8 @@ var app = builder.Build();
 app.UseExceptionHandling();
 app.UseSerilogRequestLogging();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ChurchMS API v1"));
-}
+app.UseSwagger();
+app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ChurchMS API v1"));
 
 app.UseHttpsRedirection();
 app.UseCors("Default");
