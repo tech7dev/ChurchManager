@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ASPNETCORE_URLS=\"http://localhost:5098\" ASPNETCORE_ENVIRONMENT=Development dotnet run --project src/ChurchMS.API/ChurchMS.API.csproj --no-launch-profile)"
+    ]
+  }
+}
