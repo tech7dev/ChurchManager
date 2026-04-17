@@ -288,7 +288,7 @@ When building features, follow this dependency order:
 
 ### Database
 
-- `InitialCreate` + `AddDepartmentsAndMessaging` + `AddSecretariat` + `AddEvangelism` + `AddMultimedia` + `AddLogistics` + `AddITManagement` + `AddSubscriptions` + `AddGrowthSchool` migrations deployed to remote SQL Server at `161.97.91.79,1433`
+- `InitialCreate` + `AddDepartmentsAndMessaging` + `AddSecretariat` + `AddEvangelism` + `AddMultimedia` + `AddLogistics` + `AddITManagement` + `AddSubscriptions` + `AddGrowthSchool` migrations deployed to remote SQL Server at `84.247.187.33,1433`
 - Phases 1–13 + Growth School (Phase 5 completion) deployed
 - `OnConfiguring` in `AppDbContext` suppresses `PendingModelChangesWarning` (caused by dynamic multi-tenancy query filters — by design)
 

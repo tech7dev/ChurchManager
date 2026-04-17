@@ -1,0 +1,105 @@
+@page "/it-management/users"
+@attribute [Authorize]
+@inject ITManagementService ITManagementService
+
+<PageTitle>Users — ChurchMS</PageTitle>
+
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(21,101,192,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.ManageAccounts" Color="Color.Primary" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Users</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Manage user accounts and role assignments
+            </MudText>
+        </div>
+    </div>
+</div>
+
+<MudPaper Class="mb-4 pa-3 cms-search-bar" Elevation="1">
+    <MudTextField T="string" @bind-Value="_search"
+                  Label="Search users by name or email…"
+                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search"
+                  Immediate="false" DebounceInterval="400" Variant="Variant.Outlined"
+                  OnDebounceIntervalElapsed="@(_ => _table.ReloadServerData())"
+                  Clearable="true"
+                  OnClearButtonClick="@(() => { _search = string.Empty; _table.ReloadServerData(); })" />
+</MudPaper>
+
+<MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+    <MudTable ServerData="@ServerLoad" Dense="false" Hover="true" @ref="_table"
+              RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Primary"
+              Elevation="0">
+        <HeaderContent>
+            <MudTh Style="font-weight:600;">Email</MudTh>
+            <MudTh Style="font-weight:600;">Roles</MudTh>
+            <MudTh Style="font-weight:600;">Active</MudTh>
+            <MudTh Style="font-weight:600;">Created</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Email">
+                <MudText Typo="Typo.body2" Style="font-weight:600;">@context.Email</MudText>
+            </MudTd>
+            <MudTd DataLabel="Roles">
+                <div class="d-flex flex-wrap gap-1">
+                    @foreach (var role in context.Roles)
+                    {
+                        <MudChip T="string" Size="Size.Small" Color="Color.Default"
+                                 Variant="Variant.Filled" Label="true"
+                                 Style="border-radius:6px;">
+                            @role
+                        </MudChip>
+                    }
+                </div>
+            </MudTd>
+            <MudTd DataLabel="Active">
+                <MudChip T="string" Size="Size.Small"
+                         Color="@(context.IsActive ? Color.Success : Color.Error)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @(context.IsActive ? "Active" : "Disabled")
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Created">
+                <MudText Typo="Typo.body2">@context.CreatedAt.ToString("d")</MudText>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <div class="d-flex flex-column align-center pa-8 gap-2">
+                <MudIcon Icon="@Icons.Material.Outlined.ManageAccounts"
+                         Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                <MudText Color="Color.Secondary">No users found.</MudText>
+            </div>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText Align="Align.Center" Class="pa-4" Color="Color.Secondary">Loading…</MudText>
+        </LoadingContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private MudTable<UserListDto> _table = null!;
+    private string _search = string.Empty;
+    private bool _loading;
+
+    private async Task<TableData<UserListDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await ITManagementService.GetUsersAsync(
+                state.Page + 1, state.PageSize, _search);
+            return new TableData<UserListDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+}

@@ -1,0 +1,101 @@
+@page "/attendance"
+@attribute [Authorize]
+@inject EventService EventService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>Attendance — ChurchMS</PageTitle>
+
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(76,175,80,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.FactCheck" Color="Color.Success" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Attendance</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Track event attendance records
+            </MudText>
+        </div>
+    </div>
+</div>
+
+<MudAlert Severity="Severity.Info" Variant="Variant.Text" Class="mb-4">
+    Select an event to view its attendance records
+</MudAlert>
+
+<MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+    <MudTable ServerData="@ServerLoad" Dense="false" Hover="true" @ref="_table"
+              RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Success"
+              Elevation="0"
+              OnRowClick="@((TableRowClickEventArgs<EventListDto> row) => Navigation.NavigateTo($"/attendance/{row.Item.Id}"))">
+        <HeaderContent>
+            <MudTh Style="font-weight:600;">Event</MudTh>
+            <MudTh Style="font-weight:600;">Type</MudTh>
+            <MudTh Style="font-weight:600;">Date</MudTh>
+            <MudTh Style="font-weight:600;">Location</MudTh>
+            <MudTh Style="font-weight:600;">Status</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Event">
+                <MudText Typo="Typo.body2" Style="font-weight:600;">@context.Title</MudText>
+            </MudTd>
+            <MudTd DataLabel="Type">
+                <MudText Typo="Typo.body2">@context.Type</MudText>
+            </MudTd>
+            <MudTd DataLabel="Date">
+                <MudText Typo="Typo.body2">@context.StartDateTime.ToString("g")</MudText>
+            </MudTd>
+            <MudTd DataLabel="Location">
+                <MudText Typo="Typo.body2">@(context.Location ?? "Online")</MudText>
+            </MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Size="Size.Small"
+                         Color="@EventStatusColor(context.Status)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.Status
+                </MudChip>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <div class="d-flex flex-column align-center pa-8 gap-2">
+                <MudIcon Icon="@Icons.Material.Outlined.FactCheck"
+                         Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                <MudText Color="Color.Secondary">No events found.</MudText>
+            </div>
+        </NoRecordsContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private MudTable<EventListDto> _table = null!;
+    private bool _loading;
+
+    private async Task<TableData<EventListDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await EventService.GetEventsAsync(state.Page + 1, state.PageSize);
+            return new TableData<EventListDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+
+    private static Color EventStatusColor(EventStatus status) => status switch
+    {
+        EventStatus.Published  => Color.Success,
+        EventStatus.Draft      => Color.Default,
+        EventStatus.Cancelled  => Color.Error,
+        EventStatus.Completed  => Color.Info,
+        _ => Color.Default
+    };
+}

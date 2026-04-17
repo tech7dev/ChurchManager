@@ -1,93 +1,110 @@
+@implements IDisposable
+@inject LocalisationService L
+
 <MudNavMenu Class="py-2">
 
     <MudNavLink Href="/" Match="NavLinkMatch.All"
-                Icon="@Icons.Material.Outlined.Dashboard">Dashboard</MudNavLink>
+                Icon="@Icons.Material.Outlined.Dashboard">@L.T("nav.dashboard")</MudNavLink>
 
-    <div class="cms-nav-section-label">People</div>
+    <div class="cms-nav-section-label">@L.T("nav.members")</div>
 
-    <MudNavGroup Title="Members" Icon="@Icons.Material.Outlined.People" Expanded="false">
+    <MudNavGroup Title="@L.T("nav.members")" Icon="@Icons.Material.Outlined.People" Expanded="false">
         <MudNavLink Href="/members"
-                    Icon="@Icons.Material.Outlined.PersonSearch">All Members</MudNavLink>
+                    Icon="@Icons.Material.Outlined.PersonSearch">@L.T("nav.members.all")</MudNavLink>
         <MudNavLink Href="/visitors"
-                    Icon="@Icons.Material.Outlined.PersonAdd">Visitors</MudNavLink>
+                    Icon="@Icons.Material.Outlined.PersonAdd">@L.T("nav.visitors")</MudNavLink>
         <MudNavLink Href="/families"
-                    Icon="@Icons.Material.Outlined.FamilyRestroom">Families</MudNavLink>
+                    Icon="@Icons.Material.Outlined.FamilyRestroom">@L.T("nav.families")</MudNavLink>
     </MudNavGroup>
 
-    <MudNavGroup Title="Communication" Icon="@Icons.Material.Outlined.Message" Expanded="false">
+    <MudNavGroup Title="@L.T("nav.communication")" Icon="@Icons.Material.Outlined.Message" Expanded="false">
         <MudNavLink Href="/messaging/campaigns"
-                    Icon="@Icons.Material.Outlined.Campaign">Campaigns</MudNavLink>
+                    Icon="@Icons.Material.Outlined.Campaign">@L.T("nav.campaigns")</MudNavLink>
         <MudNavLink Href="/messaging/appointments"
-                    Icon="@Icons.Material.Outlined.CalendarMonth">Appointments</MudNavLink>
+                    Icon="@Icons.Material.Outlined.CalendarMonth">@L.T("nav.appointments")</MudNavLink>
         <MudNavLink Href="/notifications"
-                    Icon="@Icons.Material.Outlined.Notifications">Notifications</MudNavLink>
+                    Icon="@Icons.Material.Outlined.Notifications">@L.T("nav.notifications")</MudNavLink>
     </MudNavGroup>
 
-    <div class="cms-nav-section-label">Finance</div>
+    <div class="cms-nav-section-label">@L.T("nav.finance")</div>
 
-    <MudNavGroup Title="Finance" Icon="@Icons.Material.Outlined.AccountBalance" Expanded="false">
+    <MudNavGroup Title="@L.T("nav.finance")" Icon="@Icons.Material.Outlined.AccountBalance" Expanded="false">
         <MudNavLink Href="/contributions"
-                    Icon="@Icons.Material.Outlined.Payments">Contributions</MudNavLink>
+                    Icon="@Icons.Material.Outlined.Payments">@L.T("nav.contributions")</MudNavLink>
         <MudNavLink Href="/expenses"
-                    Icon="@Icons.Material.Outlined.Receipt">Expenses</MudNavLink>
+                    Icon="@Icons.Material.Outlined.Receipt">@L.T("nav.expenses")</MudNavLink>
         <MudNavLink Href="/funds"
-                    Icon="@Icons.Material.Outlined.Savings">Funds</MudNavLink>
+                    Icon="@Icons.Material.Outlined.Savings">@L.T("nav.funds")</MudNavLink>
         <MudNavLink Href="/campaigns"
-                    Icon="@Icons.Material.Outlined.Flag">Campaigns</MudNavLink>
+                    Icon="@Icons.Material.Outlined.Flag">@L.T("nav.contrib.campaigns")</MudNavLink>
         <MudNavLink Href="/budgets"
-                    Icon="@Icons.Material.Outlined.AccountBalanceWallet">Budgets</MudNavLink>
+                    Icon="@Icons.Material.Outlined.AccountBalanceWallet">@L.T("nav.budgets")</MudNavLink>
     </MudNavGroup>
 
-    <div class="cms-nav-section-label">Ministry</div>
+    <div class="cms-nav-section-label">@L.T("nav.ministry")</div>
 
-    <MudNavGroup Title="Events" Icon="@Icons.Material.Outlined.Event" Expanded="false">
+    <MudNavGroup Title="@L.T("nav.events")" Icon="@Icons.Material.Outlined.Event" Expanded="false">
         <MudNavLink Href="/events"
-                    Icon="@Icons.Material.Outlined.EventNote">All Events</MudNavLink>
+                    Icon="@Icons.Material.Outlined.EventNote">@L.T("nav.events.all")</MudNavLink>
         <MudNavLink Href="/attendance"
-                    Icon="@Icons.Material.Outlined.HowToReg">Attendance</MudNavLink>
+                    Icon="@Icons.Material.Outlined.HowToReg">@L.T("nav.attendance")</MudNavLink>
     </MudNavGroup>
 
-    <MudNavGroup Title="Education" Icon="@Icons.Material.Outlined.School" Expanded="false">
+    <MudNavGroup Title="@L.T("nav.education")" Icon="@Icons.Material.Outlined.School" Expanded="false">
         <MudNavLink Href="/sunday-school"
-                    Icon="@Icons.Material.Outlined.MenuBook">Sunday School</MudNavLink>
+                    Icon="@Icons.Material.Outlined.MenuBook">@L.T("nav.sundayschool")</MudNavLink>
         <MudNavLink Href="/growth-school"
-                    Icon="@Icons.Material.Outlined.AutoStories">Growth School</MudNavLink>
+                    Icon="@Icons.Material.Outlined.AutoStories">@L.T("nav.growthschool")</MudNavLink>
     </MudNavGroup>
 
     <MudNavLink Href="/departments"
-                Icon="@Icons.Material.Outlined.Groups">Departments</MudNavLink>
+                Icon="@Icons.Material.Outlined.Groups">@L.T("nav.departments")</MudNavLink>
     <MudNavLink Href="/evangelism"
-                Icon="@Icons.Material.Outlined.Public">Evangelism</MudNavLink>
+                Icon="@Icons.Material.Outlined.Public">@L.T("nav.evangelism")</MudNavLink>
     <MudNavLink Href="/secretariat"
-                Icon="@Icons.Material.Outlined.Description">Secretariat</MudNavLink>
+                Icon="@Icons.Material.Outlined.Description">@L.T("nav.secretariat")</MudNavLink>
     <MudNavLink Href="/multimedia"
-                Icon="@Icons.Material.Outlined.VideoLibrary">Multimedia</MudNavLink>
+                Icon="@Icons.Material.Outlined.VideoLibrary">@L.T("nav.multimedia")</MudNavLink>
     <MudNavLink Href="/logistics"
-                Icon="@Icons.Material.Outlined.LocalShipping">Logistics</MudNavLink>
+                Icon="@Icons.Material.Outlined.LocalShipping">@L.T("nav.logistics")</MudNavLink>
 
-    <div class="cms-nav-section-label">Analytics</div>
+    <div class="cms-nav-section-label">@L.T("nav.reports")</div>
 
-    <MudNavGroup Title="Reports" Icon="@Icons.Material.Outlined.BarChart" Expanded="false">
+    <MudNavGroup Title="@L.T("nav.reports")" Icon="@Icons.Material.Outlined.BarChart" Expanded="false">
         <MudNavLink Href="/reports/financial"
-                    Icon="@Icons.Material.Outlined.AttachMoney">Financial</MudNavLink>
+                    Icon="@Icons.Material.Outlined.AttachMoney">@L.T("nav.reports.financial")</MudNavLink>
         <MudNavLink Href="/reports/members"
-                    Icon="@Icons.Material.Outlined.PeopleAlt">Members</MudNavLink>
+                    Icon="@Icons.Material.Outlined.PeopleAlt">@L.T("nav.reports.members")</MudNavLink>
         <MudNavLink Href="/reports/attendance"
-                    Icon="@Icons.Material.Outlined.Analytics">Attendance</MudNavLink>
+                    Icon="@Icons.Material.Outlined.Analytics">@L.T("nav.reports.attendance")</MudNavLink>
     </MudNavGroup>
 
-    <div class="cms-nav-section-label">Settings</div>
+    <div class="cms-nav-section-label">@L.T("nav.administration")</div>
 
-    <MudNavGroup Title="Administration" Icon="@Icons.Material.Outlined.AdminPanelSettings"
+    <MudNavGroup Title="@L.T("nav.administration")" Icon="@Icons.Material.Outlined.AdminPanelSettings"
                  Expanded="false">
         <MudNavLink Href="/subscriptions"
-                    Icon="@Icons.Material.Outlined.CreditCard">Subscription</MudNavLink>
+                    Icon="@Icons.Material.Outlined.CreditCard">@L.T("nav.subscription")</MudNavLink>
         <MudNavLink Href="/it-management/users"
-                    Icon="@Icons.Material.Outlined.ManageAccounts">Users</MudNavLink>
+                    Icon="@Icons.Material.Outlined.ManageAccounts">@L.T("nav.users")</MudNavLink>
         <MudNavLink Href="/it-management/tickets"
-                    Icon="@Icons.Material.Outlined.ConfirmationNumber">Support Tickets</MudNavLink>
+                    Icon="@Icons.Material.Outlined.ConfirmationNumber">@L.T("nav.tickets")</MudNavLink>
         <MudNavLink Href="/it-management/integrations"
-                    Icon="@Icons.Material.Outlined.IntegrationInstructions">Integrations</MudNavLink>
+                    Icon="@Icons.Material.Outlined.IntegrationInstructions">@L.T("nav.integrations")</MudNavLink>
     </MudNavGroup>
 
 </MudNavMenu>
+
+@code {
+    protected override void OnInitialized()
+    {
+        L.OnLanguageChanged += Refresh;
+    }
+
+    private void Refresh() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        L.OnLanguageChanged -= Refresh;
+    }
+}

@@ -21,9 +21,9 @@ public class AuthService(
 
         var result = await response.Content
             .ReadFromJsonAsync<ApiResponse<LoginResponseDto>>();
-        if (result?.Success != true || result.Data?.Token is null) return false;
+        if (result?.Success != true || result.Data?.AccessToken is null) return false;
 
-        await _jwtProvider.SetTokenAsync(result.Data.Token);
+        await _jwtProvider.SetTokenAsync(result.Data.AccessToken);
         return true;
     }
 
@@ -36,10 +36,11 @@ public class AuthService(
 }
 
 public record LoginResponseDto(
-    string Token,
+    string AccessToken,
     string RefreshToken,
-    DateTime ExpiresAt,
-    string UserName,
+    DateTime AccessTokenExpiration,
+    Guid UserId,
     string Email,
-    Guid? ChurchId,
+    string FirstName,
+    string LastName,
     IList<string> Roles);

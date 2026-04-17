@@ -1,0 +1,122 @@
+@page "/visitors"
+@attribute [Authorize]
+@inject MemberService MemberService
+
+<PageTitle>Visitors — ChurchMS</PageTitle>
+
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(255,152,0,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.PersonSearch" Color="Color.Warning" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Visitors</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Track and follow up with church visitors
+            </MudText>
+        </div>
+    </div>
+    <MudButton Variant="Variant.Filled" Color="Color.Warning"
+               StartIcon="@Icons.Material.Outlined.PersonAdd"
+               Style="border-radius:10px;">Add Visitor</MudButton>
+</div>
+
+<MudPaper Class="mb-4 pa-3 cms-search-bar" Elevation="1">
+    <MudTextField T="string" @bind-Value="_search"
+                  Label="Search by name, phone or email…"
+                  Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Outlined.Search"
+                  Immediate="false" DebounceInterval="400" Variant="Variant.Outlined"
+                  OnDebounceIntervalElapsed="@(_ => _table.ReloadServerData())"
+                  Clearable="true"
+                  OnClearButtonClick="@(() => { _search = string.Empty; _table.ReloadServerData(); })" />
+</MudPaper>
+
+<MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+    <MudTable ServerData="@ServerLoad" Dense="false" Hover="true" @ref="_table"
+              RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Warning"
+              Elevation="0">
+        <HeaderContent>
+            <MudTh Style="font-weight:600;">Name</MudTh>
+            <MudTh Style="font-weight:600;">Phone</MudTh>
+            <MudTh Style="font-weight:600;">Email</MudTh>
+            <MudTh Style="font-weight:600;">First Visit</MudTh>
+            <MudTh Style="font-weight:600;">How Heard</MudTh>
+            <MudTh Style="font-weight:600;">Status</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">
+                <div class="d-flex align-center gap-2">
+                    <MudAvatar Size="Size.Small" Color="Color.Warning"
+                               Style="border-radius:8px;font-size:0.8rem;font-weight:600;">
+                        @context.FirstName[0]
+                    </MudAvatar>
+                    <MudText Style="font-weight:500;">@context.FullName</MudText>
+                </div>
+            </MudTd>
+            <MudTd DataLabel="Phone">
+                <MudText Typo="Typo.body2">@context.Phone</MudText>
+            </MudTd>
+            <MudTd DataLabel="Email">
+                <MudText Typo="Typo.body2">@context.Email</MudText>
+            </MudTd>
+            <MudTd DataLabel="First Visit">
+                <MudText Typo="Typo.body2">@context.FirstVisitDate?.ToString("d")</MudText>
+            </MudTd>
+            <MudTd DataLabel="How Heard">
+                <MudText Typo="Typo.body2">@context.HowHeardAboutUs</MudText>
+            </MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Size="Size.Small" Color="@StatusColor(context.Status)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.Status
+                </MudChip>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <div class="d-flex flex-column align-center pa-8 gap-2">
+                <MudIcon Icon="@Icons.Material.Outlined.PersonSearch"
+                         Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                <MudText Color="Color.Secondary">No visitors found.</MudText>
+            </div>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText Align="Align.Center" Class="pa-4" Color="Color.Secondary">Loading…</MudText>
+        </LoadingContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private MudTable<VisitorDto> _table = null!;
+    private string _search = string.Empty;
+    private bool _loading;
+
+    private async Task<TableData<VisitorDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await MemberService.GetVisitorsAsync(
+                state.Page + 1, state.PageSize, _search);
+            return new TableData<VisitorDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+
+    private static Color StatusColor(VisitorStatus status) => status switch
+    {
+        VisitorStatus.New        => Color.Info,
+        VisitorStatus.Returning  => Color.Primary,
+        VisitorStatus.FollowedUp => Color.Warning,
+        VisitorStatus.Converted  => Color.Success,
+        VisitorStatus.Inactive   => Color.Default,
+        _ => Color.Default
+    };
+}

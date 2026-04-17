@@ -1,0 +1,97 @@
+@page "/growth-school"
+@attribute [Authorize]
+@inject EducationService EducationService
+
+<PageTitle>Growth School — ChurchMS</PageTitle>
+
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(76,175,80,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.TrendingUp" Color="Color.Success" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Growth School</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Discipleship courses and spiritual growth programs
+            </MudText>
+        </div>
+    </div>
+</div>
+
+<MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+    <MudTable ServerData="@ServerLoad" Dense="false" Hover="true" @ref="_table"
+              RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Success"
+              Elevation="0">
+        <HeaderContent>
+            <MudTh Style="font-weight:600;">Name</MudTh>
+            <MudTh Style="font-weight:600;">Level</MudTh>
+            <MudTh Style="font-weight:600;">Instructor</MudTh>
+            <MudTh Style="font-weight:600;">Duration</MudTh>
+            <MudTh Style="font-weight:600;">Enrolled</MudTh>
+            <MudTh Style="font-weight:600;">Active</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">
+                <MudText Typo="Typo.body2" Style="font-weight:600;">@context.Name</MudText>
+            </MudTd>
+            <MudTd DataLabel="Level">
+                <MudChip T="string" Size="Size.Small" Color="Color.Default"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.Level
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Instructor">
+                <MudText Typo="Typo.body2">@(context.InstructorName ?? "—")</MudText>
+            </MudTd>
+            <MudTd DataLabel="Duration">
+                <MudText Typo="Typo.body2">@(context.DurationWeeks.HasValue ? $"{context.DurationWeeks} weeks" : "—")</MudText>
+            </MudTd>
+            <MudTd DataLabel="Enrolled">
+                <MudText Typo="Typo.body2">@context.EnrollmentCount</MudText>
+            </MudTd>
+            <MudTd DataLabel="Active">
+                <MudChip T="string" Size="Size.Small"
+                         Color="@(context.IsActive ? Color.Success : Color.Default)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @(context.IsActive ? "Active" : "Inactive")
+                </MudChip>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <div class="d-flex flex-column align-center pa-8 gap-2">
+                <MudIcon Icon="@Icons.Material.Outlined.TrendingUp"
+                         Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                <MudText Color="Color.Secondary">No courses found.</MudText>
+            </div>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText Align="Align.Center" Class="pa-4" Color="Color.Secondary">Loading…</MudText>
+        </LoadingContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private MudTable<GrowthSchoolCourseDto> _table = null!;
+    private bool _loading;
+
+    private async Task<TableData<GrowthSchoolCourseDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await EducationService.GetGrowthSchoolCoursesAsync(
+                state.Page + 1, state.PageSize);
+            return new TableData<GrowthSchoolCourseDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+}

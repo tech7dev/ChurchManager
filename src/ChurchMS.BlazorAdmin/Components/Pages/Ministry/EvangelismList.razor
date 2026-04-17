@@ -1,0 +1,97 @@
+@page "/evangelism"
+@attribute [Authorize]
+@inject MinistryService MinistryService
+@inject ISnackbar Snackbar
+
+<PageTitle>Evangelism — ChurchMS</PageTitle>
+
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(76,175,80,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.RecordVoiceOver" Color="Color.Success" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Evangelism</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Outreach campaigns, teams, and contact follow-ups
+            </MudText>
+        </div>
+    </div>
+</div>
+
+<MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+    <MudTable ServerData="@ServerLoad" Dense="false" Hover="true" @ref="_table"
+              RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Success"
+              Elevation="0">
+        <HeaderContent>
+            <MudTh Style="font-weight:600;">Name</MudTh>
+            <MudTh Style="font-weight:600;">Leader</MudTh>
+            <MudTh Style="font-weight:600;">Period</MudTh>
+            <MudTh Style="font-weight:600;">Goal Contacts</MudTh>
+            <MudTh Style="font-weight:600;">Status</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">
+                <MudText Typo="Typo.body2" Style="font-weight:600;">@context.Name</MudText>
+            </MudTd>
+            <MudTd DataLabel="Leader">
+                <MudText Typo="Typo.body2">@(context.LeaderName ?? "—")</MudText>
+            </MudTd>
+            <MudTd DataLabel="Period">
+                <MudText Typo="Typo.body2">
+                    @context.StartDate.ToString("d") – @(context.EndDate?.ToString("d") ?? "Ongoing")
+                </MudText>
+            </MudTd>
+            <MudTd DataLabel="Goal Contacts">
+                <MudText Typo="Typo.body2">@(context.GoalContacts?.ToString() ?? "—")</MudText>
+            </MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Size="Size.Small"
+                         Color="@CampaignStatusColor(context.Status)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.Status
+                </MudChip>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <div class="d-flex flex-column align-center pa-8 gap-2">
+                <MudIcon Icon="@Icons.Material.Outlined.RecordVoiceOver"
+                         Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                <MudText Color="Color.Secondary">No evangelism campaigns found.</MudText>
+            </div>
+        </NoRecordsContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private MudTable<EvangelismCampaignDto> _table = null!;
+    private bool _loading;
+
+    private async Task<TableData<EvangelismCampaignDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await MinistryService.GetEvangelismCampaignsAsync(state.Page + 1, state.PageSize);
+            return new TableData<EvangelismCampaignDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+
+    private static Color CampaignStatusColor(string status) => status switch
+    {
+        "Draft"     => Color.Default,
+        "Active"    => Color.Success,
+        "Completed" => Color.Info,
+        "Cancelled" => Color.Error,
+        _ => Color.Default
+    };
+}

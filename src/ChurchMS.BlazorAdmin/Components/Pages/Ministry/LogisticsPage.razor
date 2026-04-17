@@ -1,0 +1,173 @@
+@page "/logistics"
+@attribute [Authorize]
+@inject MinistryService MinistryService
+@inject ISnackbar Snackbar
+
+<PageTitle>Logistics — ChurchMS</PageTitle>
+
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(255,152,0,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.Inventory2" Color="Color.Warning" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Logistics</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Inventory management and vehicle fleet
+            </MudText>
+        </div>
+    </div>
+</div>
+
+<MudTabs Elevation="1" Rounded="true" ApplyEffectsToContainer="true" Class="mb-4"
+         ActivePanelIndexChanged="@OnTabChanged">
+    <MudTabPanel Text="Inventory" Icon="@Icons.Material.Outlined.Inventory">
+        <MudPaper Elevation="0" Style="border-radius:0 0 12px 12px;overflow:hidden;">
+            <MudTable ServerData="@InventoryServerLoad" Dense="false" Hover="true" @ref="_inventoryTable"
+                      RowsPerPage="20" Loading="@_inventoryLoading" LoadingProgressColor="Color.Warning"
+                      Elevation="0">
+                <HeaderContent>
+                    <MudTh Style="font-weight:600;">Name</MudTh>
+                    <MudTh Style="font-weight:600;">Category</MudTh>
+                    <MudTh Style="font-weight:600;">Qty</MudTh>
+                    <MudTh Style="font-weight:600;">Location</MudTh>
+                    <MudTh Style="font-weight:600;">Status</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Name">
+                        <MudText Typo="Typo.body2" Style="font-weight:600;">@context.Name</MudText>
+                    </MudTd>
+                    <MudTd DataLabel="Category">
+                        <MudText Typo="Typo.body2">@(context.Category ?? "—")</MudText>
+                    </MudTd>
+                    <MudTd DataLabel="Qty">
+                        <MudText Typo="Typo.body2">@context.Quantity @(context.Unit ?? "")</MudText>
+                    </MudTd>
+                    <MudTd DataLabel="Location">
+                        <MudText Typo="Typo.body2">@(context.Location ?? "—")</MudText>
+                    </MudTd>
+                    <MudTd DataLabel="Status">
+                        <MudChip T="string" Size="Size.Small"
+                                 Color="@AssetStatusColor(context.Status)"
+                                 Variant="Variant.Filled" Label="true"
+                                 Style="border-radius:6px;">
+                            @context.Status
+                        </MudChip>
+                    </MudTd>
+                </RowTemplate>
+                <NoRecordsContent>
+                    <div class="d-flex flex-column align-center pa-8 gap-2">
+                        <MudIcon Icon="@Icons.Material.Outlined.Inventory"
+                                 Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                        <MudText Color="Color.Secondary">No inventory items found.</MudText>
+                    </div>
+                </NoRecordsContent>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
+        </MudPaper>
+    </MudTabPanel>
+
+    <MudTabPanel Text="Vehicles" Icon="@Icons.Material.Outlined.DirectionsCar">
+        <MudPaper Elevation="0" Style="border-radius:0 0 12px 12px;overflow:hidden;">
+            <MudTable ServerData="@VehiclesServerLoad" Dense="false" Hover="true" @ref="_vehiclesTable"
+                      RowsPerPage="20" Loading="@_vehiclesLoading" LoadingProgressColor="Color.Warning"
+                      Elevation="0">
+                <HeaderContent>
+                    <MudTh Style="font-weight:600;">Vehicle</MudTh>
+                    <MudTh Style="font-weight:600;">Year</MudTh>
+                    <MudTh Style="font-weight:600;">Plate</MudTh>
+                    <MudTh Style="font-weight:600;">Capacity</MudTh>
+                    <MudTh Style="font-weight:600;">Status</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Vehicle">
+                        <MudText Typo="Typo.body2" Style="font-weight:600;">@context.Make @context.Model</MudText>
+                    </MudTd>
+                    <MudTd DataLabel="Year">
+                        <MudText Typo="Typo.body2">@(context.Year?.ToString() ?? "—")</MudText>
+                    </MudTd>
+                    <MudTd DataLabel="Plate">
+                        <MudText Typo="Typo.body2">@(context.PlateNumber ?? "—")</MudText>
+                    </MudTd>
+                    <MudTd DataLabel="Capacity">
+                        <MudText Typo="Typo.body2">@(context.Capacity?.ToString() ?? "—")</MudText>
+                    </MudTd>
+                    <MudTd DataLabel="Status">
+                        <MudChip T="string" Size="Size.Small"
+                                 Color="@AssetStatusColor(context.Status)"
+                                 Variant="Variant.Filled" Label="true"
+                                 Style="border-radius:6px;">
+                            @context.Status
+                        </MudChip>
+                    </MudTd>
+                </RowTemplate>
+                <NoRecordsContent>
+                    <div class="d-flex flex-column align-center pa-8 gap-2">
+                        <MudIcon Icon="@Icons.Material.Outlined.DirectionsCar"
+                                 Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                        <MudText Color="Color.Secondary">No vehicles found.</MudText>
+                    </div>
+                </NoRecordsContent>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
+        </MudPaper>
+    </MudTabPanel>
+</MudTabs>
+
+@code {
+    private MudTable<InventoryItemDto> _inventoryTable = null!;
+    private MudTable<VehicleListDto> _vehiclesTable = null!;
+    private bool _inventoryLoading;
+    private bool _vehiclesLoading;
+
+    private async Task<TableData<InventoryItemDto>> InventoryServerLoad(TableState state, CancellationToken ct)
+    {
+        _inventoryLoading = true;
+        try
+        {
+            var result = await MinistryService.GetInventoryItemsAsync(state.Page + 1, state.PageSize);
+            return new TableData<InventoryItemDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _inventoryLoading = false; }
+    }
+
+    private async Task<TableData<VehicleListDto>> VehiclesServerLoad(TableState state, CancellationToken ct)
+    {
+        _vehiclesLoading = true;
+        try
+        {
+            var result = await MinistryService.GetVehiclesAsync(state.Page + 1, state.PageSize);
+            return new TableData<VehicleListDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _vehiclesLoading = false; }
+    }
+
+    private void OnTabChanged(int index)
+    {
+        if (index == 0)
+            _inventoryTable?.ReloadServerData();
+        else if (index == 1)
+            _vehiclesTable?.ReloadServerData();
+    }
+
+    private static Color AssetStatusColor(string status) => status switch
+    {
+        "Available"        => Color.Success,
+        "InUse"            => Color.Info,
+        "UnderMaintenance" => Color.Warning,
+        "Retired"          => Color.Dark,
+        _ => Color.Default
+    };
+}

@@ -1,0 +1,97 @@
+@page "/messaging/appointments"
+@attribute [Authorize]
+@inject MessagingService MessagingService
+@inject ISnackbar Snackbar
+
+<PageTitle>Appointments — ChurchMS</PageTitle>
+
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(84,110,122,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.CalendarMonth" Color="Color.Secondary" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Appointments</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Schedule and manage pastoral appointments
+            </MudText>
+        </div>
+    </div>
+</div>
+
+<MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+    <MudTable ServerData="@ServerLoad" Dense="false" Hover="true" @ref="_table"
+              RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Secondary"
+              Elevation="0">
+        <HeaderContent>
+            <MudTh Style="font-weight:600;">Subject</MudTh>
+            <MudTh Style="font-weight:600;">Requested By</MudTh>
+            <MudTh Style="font-weight:600;">Assigned To</MudTh>
+            <MudTh Style="font-weight:600;">Scheduled</MudTh>
+            <MudTh Style="font-weight:600;">Status</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Subject">
+                <MudText Typo="Typo.body2" Style="font-weight:600;">@context.Subject</MudText>
+            </MudTd>
+            <MudTd DataLabel="Requested By">
+                <MudText Typo="Typo.body2">@context.MemberName</MudText>
+            </MudTd>
+            <MudTd DataLabel="Assigned To">
+                <MudText Typo="Typo.body2">@(context.AssigneeName ?? "—")</MudText>
+            </MudTd>
+            <MudTd DataLabel="Scheduled">
+                <MudText Typo="Typo.body2">@(context.ScheduledAt?.ToString("g") ?? "—")</MudText>
+            </MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Size="Size.Small"
+                         Color="@AppointmentStatusColor(context.Status)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.Status
+                </MudChip>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <div class="d-flex flex-column align-center pa-8 gap-2">
+                <MudIcon Icon="@Icons.Material.Outlined.CalendarMonth"
+                         Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                <MudText Color="Color.Secondary">No appointments found.</MudText>
+            </div>
+        </NoRecordsContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private MudTable<AppointmentListDto> _table = null!;
+    private bool _loading;
+
+    private async Task<TableData<AppointmentListDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await MessagingService.GetAppointmentsAsync(state.Page + 1, state.PageSize);
+            return new TableData<AppointmentListDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+
+    private static Color AppointmentStatusColor(string status) => status switch
+    {
+        "Pending"   => Color.Warning,
+        "Scheduled" => Color.Info,
+        "Confirmed" => Color.Success,
+        "Cancelled" => Color.Error,
+        "Completed" => Color.Dark,
+        "NoShow"    => Color.Default,
+        _ => Color.Default
+    };
+}

@@ -1,0 +1,87 @@
+@page "/funds"
+@attribute [Authorize]
+@inject FinanceService FinanceService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>Funds — ChurchMS</PageTitle>
+
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(21,101,192,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.AccountBalance" Color="Color.Primary" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Funds</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Manage contribution funds and designations
+            </MudText>
+        </div>
+    </div>
+</div>
+
+<MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+    <MudTable ServerData="@ServerLoad" Dense="false" Hover="true" @ref="_table"
+              RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Primary"
+              Elevation="0">
+        <HeaderContent>
+            <MudTh Style="font-weight:600;">Name</MudTh>
+            <MudTh Style="font-weight:600;">Description</MudTh>
+            <MudTh Style="font-weight:600;">Default</MudTh>
+            <MudTh Style="font-weight:600;">Active</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">
+                <MudText Typo="Typo.body2" Style="font-weight:600;">@context.Name</MudText>
+            </MudTd>
+            <MudTd DataLabel="Description">
+                <MudText Typo="Typo.body2">@(context.Description ?? "—")</MudText>
+            </MudTd>
+            <MudTd DataLabel="Default">
+                @if (context.IsDefault)
+                {
+                    <MudIcon Icon="@Icons.Material.Outlined.Check" Color="Color.Success" />
+                }
+            </MudTd>
+            <MudTd DataLabel="Active">
+                <MudChip T="string" Size="Size.Small"
+                         Color="@(context.IsActive ? Color.Success : Color.Default)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @(context.IsActive ? "Active" : "Inactive")
+                </MudChip>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <div class="d-flex flex-column align-center pa-8 gap-2">
+                <MudIcon Icon="@Icons.Material.Outlined.AccountBalance"
+                         Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                <MudText Color="Color.Secondary">No funds found.</MudText>
+            </div>
+        </NoRecordsContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private MudTable<FundDto> _table = null!;
+    private bool _loading;
+
+    private async Task<TableData<FundDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await FinanceService.GetFundsAsync(
+                state.Page + 1, state.PageSize);
+            return new TableData<FundDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+}

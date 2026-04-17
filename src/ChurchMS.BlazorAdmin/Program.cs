@@ -45,6 +45,9 @@ builder.Services.AddScoped<DepartmentService>();
 builder.Services.AddScoped<MessagingService>();
 builder.Services.AddScoped<SubscriptionService>();
 builder.Services.AddScoped<ITManagementService>();
+builder.Services.AddScoped<EducationService>();
+builder.Services.AddScoped<MinistryService>();
+builder.Services.AddScoped<LocalisationService>();
 
 var app = builder.Build();
 

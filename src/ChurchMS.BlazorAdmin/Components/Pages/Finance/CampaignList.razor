@@ -1,0 +1,97 @@
+@page "/campaigns"
+@attribute [Authorize]
+@inject FinanceService FinanceService
+@inject NavigationManager Navigation
+@inject ISnackbar Snackbar
+
+<PageTitle>Contribution Campaigns — ChurchMS</PageTitle>
+
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(76,175,80,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.VolunteerActivism" Color="Color.Success" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Contribution Campaigns</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Track fundraising campaigns and goals
+            </MudText>
+        </div>
+    </div>
+</div>
+
+<MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+    <MudTable ServerData="@ServerLoad" Dense="false" Hover="true" @ref="_table"
+              RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Success"
+              Elevation="0">
+        <HeaderContent>
+            <MudTh Style="font-weight:600;">Name</MudTh>
+            <MudTh Style="font-weight:600;">Target</MudTh>
+            <MudTh Style="font-weight:600;">Period</MudTh>
+            <MudTh Style="font-weight:600;">Status</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">
+                <MudText Typo="Typo.body2" Style="font-weight:600;">@context.Name</MudText>
+            </MudTd>
+            <MudTd DataLabel="Target">
+                <MudText Typo="Typo.body2" Style="font-weight:700;">
+                    @context.TargetAmount.ToString("N2") @context.Currency
+                </MudText>
+            </MudTd>
+            <MudTd DataLabel="Period">
+                <MudText Typo="Typo.body2">
+                    @context.StartDate.ToString("d") – @context.EndDate.ToString("d")
+                </MudText>
+            </MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Size="Size.Small"
+                         Color="@CampaignStatusColor(context.Status)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.Status
+                </MudChip>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <div class="d-flex flex-column align-center pa-8 gap-2">
+                <MudIcon Icon="@Icons.Material.Outlined.VolunteerActivism"
+                         Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                <MudText Color="Color.Secondary">No campaigns found.</MudText>
+            </div>
+        </NoRecordsContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private MudTable<CampaignDto> _table = null!;
+    private bool _loading;
+
+    private async Task<TableData<CampaignDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await FinanceService.GetCampaignsAsync(
+                state.Page + 1, state.PageSize);
+            return new TableData<CampaignDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+
+    private static Color CampaignStatusColor(CampaignStatus status) => status switch
+    {
+        CampaignStatus.Draft     => Color.Default,
+        CampaignStatus.Active    => Color.Success,
+        CampaignStatus.Completed => Color.Info,
+        CampaignStatus.Cancelled => Color.Error,
+        _ => Color.Default
+    };
+}

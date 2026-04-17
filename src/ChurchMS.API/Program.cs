@@ -164,5 +164,6 @@ if (app.Environment.IsDevelopment())
 }
 
 await SuperAdminSeedData.SeedSuperAdminAsync(app.Services);
+await DemoUserSeedData.SeedDemoUsersAsync(app.Services);
 
 await app.RunAsync();

@@ -1,0 +1,123 @@
+@page "/multimedia"
+@attribute [Authorize]
+@inject MinistryService MinistryService
+@inject ISnackbar Snackbar
+
+<PageTitle>Multimedia — ChurchMS</PageTitle>
+
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(211,47,47,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.VideoLibrary" Color="Color.Error" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Multimedia</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Manage video, audio, and digital content
+            </MudText>
+        </div>
+    </div>
+</div>
+
+<MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+    <MudTable ServerData="@ServerLoad" Dense="false" Hover="true" @ref="_table"
+              RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Error"
+              Elevation="0">
+        <HeaderContent>
+            <MudTh Style="font-weight:600;">Title</MudTh>
+            <MudTh Style="font-weight:600;">Type</MudTh>
+            <MudTh Style="font-weight:600;">Access</MudTh>
+            <MudTh Style="font-weight:600;">Price</MudTh>
+            <MudTh Style="font-weight:600;">Views</MudTh>
+            <MudTh Style="font-weight:600;">Downloads</MudTh>
+            <MudTh Style="font-weight:600;">Status</MudTh>
+            <MudTh Style="font-weight:600;">Published</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Title">
+                <MudText Typo="Typo.body2" Style="font-weight:600;">@context.Title</MudText>
+            </MudTd>
+            <MudTd DataLabel="Type">
+                <MudChip T="string" Size="Size.Small"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.ContentType
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Access">
+                <MudChip T="string" Size="Size.Small"
+                         Color="@AccessTypeColor(context.AccessType)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.AccessType
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Price">
+                <MudText Typo="Typo.body2">@(context.Price.HasValue ? context.Price.Value.ToString("C") : "—")</MudText>
+            </MudTd>
+            <MudTd DataLabel="Views">
+                <MudText Typo="Typo.body2">@context.ViewCount</MudText>
+            </MudTd>
+            <MudTd DataLabel="Downloads">
+                <MudText Typo="Typo.body2">@context.DownloadCount</MudText>
+            </MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Size="Size.Small"
+                         Color="@MediaStatusColor(context.Status)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.Status
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Published">
+                <MudText Typo="Typo.body2">@(context.PublishedAt?.ToString("g") ?? "—")</MudText>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <div class="d-flex flex-column align-center pa-8 gap-2">
+                <MudIcon Icon="@Icons.Material.Outlined.VideoLibrary"
+                         Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                <MudText Color="Color.Secondary">No media content found.</MudText>
+            </div>
+        </NoRecordsContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private MudTable<MediaContentListDto> _table = null!;
+    private bool _loading;
+
+    private async Task<TableData<MediaContentListDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await MinistryService.GetMediaContentsAsync(state.Page + 1, state.PageSize);
+            return new TableData<MediaContentListDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+
+    private static Color AccessTypeColor(string accessType) => accessType switch
+    {
+        "Free"        => Color.Success,
+        "Paid"        => Color.Warning,
+        "MembersOnly" => Color.Info,
+        _ => Color.Default
+    };
+
+    private static Color MediaStatusColor(string status) => status switch
+    {
+        "Draft"     => Color.Default,
+        "Published" => Color.Success,
+        "Archived"  => Color.Dark,
+        _ => Color.Default
+    };
+}

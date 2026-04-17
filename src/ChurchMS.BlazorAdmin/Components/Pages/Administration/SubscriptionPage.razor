@@ -1,0 +1,248 @@
+@page "/subscriptions"
+@attribute [Authorize]
+@inject SubscriptionService SubscriptionService
+
+<PageTitle>Subscription — ChurchMS</PageTitle>
+
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(21,101,192,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.CardMembership" Color="Color.Primary" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Subscription & Billing</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Manage your church subscription plan and invoices
+            </MudText>
+        </div>
+    </div>
+</div>
+
+<MudGrid Class="mb-4">
+    <MudItem xs="12" md="6">
+        <MudCard Elevation="1" Style="border-radius:12px;height:100%;">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6" Style="font-weight:600;">Current Plan</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                @if (_subscriptionLoading)
+                {
+                    <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Primary" />
+                }
+                else if (_subscription is not null)
+                {
+                    <MudSimpleTable Dense="true" Hover="false" Bordered="false" Elevation="0">
+                        <tbody>
+                            <tr>
+                                <td><MudText Typo="Typo.body2" Color="Color.Secondary">Plan</MudText></td>
+                                <td><MudText Typo="Typo.body2" Style="font-weight:600;">@_subscription.Plan</MudText></td>
+                            </tr>
+                            <tr>
+                                <td><MudText Typo="Typo.body2" Color="Color.Secondary">Status</MudText></td>
+                                <td>
+                                    <MudChip T="string" Size="Size.Small"
+                                             Color="@SubscriptionStatusColor(_subscription.Status)"
+                                             Variant="Variant.Filled" Label="true"
+                                             Style="border-radius:6px;">
+                                        @_subscription.Status
+                                    </MudChip>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><MudText Typo="Typo.body2" Color="Color.Secondary">Billing Cycle</MudText></td>
+                                <td><MudText Typo="Typo.body2">@_subscription.BillingCycle</MudText></td>
+                            </tr>
+                            <tr>
+                                <td><MudText Typo="Typo.body2" Color="Color.Secondary">Amount</MudText></td>
+                                <td><MudText Typo="Typo.body2" Style="font-weight:600;">@_subscription.Amount.ToString("N2") @_subscription.Currency</MudText></td>
+                            </tr>
+                            <tr>
+                                <td><MudText Typo="Typo.body2" Color="Color.Secondary">Auto-Renew</MudText></td>
+                                <td>
+                                    <MudChip T="string" Size="Size.Small"
+                                             Color="@(_subscription.AutoRenew ? Color.Success : Color.Default)"
+                                             Variant="Variant.Filled" Label="true"
+                                             Style="border-radius:6px;">
+                                        @(_subscription.AutoRenew ? "Yes" : "No")
+                                    </MudChip>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><MudText Typo="Typo.body2" Color="Color.Secondary">Current Period End</MudText></td>
+                                <td><MudText Typo="Typo.body2">@(_subscription.CurrentPeriodEnd?.ToString("d") ?? "—")</MudText></td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                }
+                else
+                {
+                    <MudText Color="Color.Secondary">No active subscription.</MudText>
+                }
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+
+    <MudItem xs="12" md="6">
+        <MudCard Elevation="1" Style="border-radius:12px;height:100%;">
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6" Style="font-weight:600;">SMS Credits</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                @if (_smsLoading)
+                {
+                    <MudProgressCircular Indeterminate="true" Size="Size.Small" Color="Color.Primary" />
+                }
+                else if (_smsCredits is not null)
+                {
+                    <MudSimpleTable Dense="true" Hover="false" Bordered="false" Elevation="0">
+                        <tbody>
+                            <tr>
+                                <td><MudText Typo="Typo.body2" Color="Color.Secondary">Balance</MudText></td>
+                                <td><MudText Typo="Typo.body2" Style="font-weight:700;font-size:1.2rem;">@_smsCredits.Balance</MudText></td>
+                            </tr>
+                            <tr>
+                                <td><MudText Typo="Typo.body2" Color="Color.Secondary">Total Purchased</MudText></td>
+                                <td><MudText Typo="Typo.body2">@_smsCredits.TotalPurchased</MudText></td>
+                            </tr>
+                            <tr>
+                                <td><MudText Typo="Typo.body2" Color="Color.Secondary">Total Consumed</MudText></td>
+                                <td><MudText Typo="Typo.body2">@_smsCredits.TotalConsumed</MudText></td>
+                            </tr>
+                        </tbody>
+                    </MudSimpleTable>
+                }
+                else
+                {
+                    <MudText Color="Color.Secondary">No SMS credit data available.</MudText>
+                }
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
+
+<MudText Typo="Typo.h6" Style="font-weight:600;" Class="mb-3">Invoices</MudText>
+
+<MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+    <MudTable ServerData="@ServerLoadInvoices" Dense="false" Hover="true" @ref="_invoiceTable"
+              RowsPerPage="20" Loading="@_invoiceLoading" LoadingProgressColor="Color.Primary"
+              Elevation="0">
+        <HeaderContent>
+            <MudTh Style="font-weight:600;">Invoice #</MudTh>
+            <MudTh Style="font-weight:600;">Amount</MudTh>
+            <MudTh Style="font-weight:600;">Status</MudTh>
+            <MudTh Style="font-weight:600;">Due Date</MudTh>
+            <MudTh Style="font-weight:600;">Paid At</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Invoice #">
+                <MudText Typo="Typo.body2" Style="font-weight:600;">@context.InvoiceNumber</MudText>
+            </MudTd>
+            <MudTd DataLabel="Amount">
+                <MudText Typo="Typo.body2">@context.Amount.ToString("N2") @context.Currency</MudText>
+            </MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Size="Size.Small"
+                         Color="@InvoiceStatusColor(context.Status)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.Status
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Due Date">
+                <MudText Typo="Typo.body2">@context.DueDate.ToString("d")</MudText>
+            </MudTd>
+            <MudTd DataLabel="Paid At">
+                <MudText Typo="Typo.body2">@(context.PaidAt?.ToString("g") ?? "—")</MudText>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <div class="d-flex flex-column align-center pa-8 gap-2">
+                <MudIcon Icon="@Icons.Material.Outlined.Receipt"
+                         Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                <MudText Color="Color.Secondary">No invoices found.</MudText>
+            </div>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText Align="Align.Center" Class="pa-4" Color="Color.Secondary">Loading…</MudText>
+        </LoadingContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private SubscriptionDto? _subscription;
+    private SmsCreditDto? _smsCredits;
+    private bool _subscriptionLoading = true;
+    private bool _smsLoading = true;
+    private bool _invoiceLoading;
+    private MudTable<InvoiceListDto> _invoiceTable = null!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var subTask = LoadSubscriptionAsync();
+        var smsTask = LoadSmsCreditsAsync();
+        await Task.WhenAll(subTask, smsTask);
+    }
+
+    private async Task LoadSubscriptionAsync()
+    {
+        _subscriptionLoading = true;
+        try
+        {
+            _subscription = await SubscriptionService.GetCurrentSubscriptionAsync();
+        }
+        finally { _subscriptionLoading = false; }
+    }
+
+    private async Task LoadSmsCreditsAsync()
+    {
+        _smsLoading = true;
+        try
+        {
+            _smsCredits = await SubscriptionService.GetSmsCreditBalanceAsync();
+        }
+        finally { _smsLoading = false; }
+    }
+
+    private async Task<TableData<InvoiceListDto>> ServerLoadInvoices(TableState state, CancellationToken ct)
+    {
+        _invoiceLoading = true;
+        try
+        {
+            var result = await SubscriptionService.GetInvoicesAsync(
+                state.Page + 1, state.PageSize);
+            return new TableData<InvoiceListDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _invoiceLoading = false; }
+    }
+
+    private static Color SubscriptionStatusColor(string status) => status switch
+    {
+        "Active" => Color.Success,
+        "Trialing" => Color.Info,
+        "PastDue" => Color.Warning,
+        "Cancelled" => Color.Error,
+        "Expired" => Color.Dark,
+        _ => Color.Default
+    };
+
+    private static Color InvoiceStatusColor(string status) => status switch
+    {
+        "Draft" => Color.Default,
+        "Sent" => Color.Info,
+        "Paid" => Color.Success,
+        "Overdue" => Color.Error,
+        "Cancelled" => Color.Dark,
+        _ => Color.Default
+    };
+}

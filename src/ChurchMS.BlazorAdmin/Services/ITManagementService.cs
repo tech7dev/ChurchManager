@@ -22,6 +22,12 @@ public class ITManagementService(IHttpClientFactory httpClientFactory, IAuthServ
             url += $"&searchTerm={Uri.EscapeDataString(search)}";
         return await ReadPagedAsync<UserListDto>(await client.GetAsync(url));
     }
+
+    public async Task<PagedResult<IntegrationListDto>?> GetIntegrationsAsync(int page = 1, int pageSize = 20)
+    {
+        var client = await GetClientAsync();
+        return await ReadPagedAsync<IntegrationListDto>(await client.GetAsync($"api/v1/itmanagement/integrations?page={page}&pageSize={pageSize}"));
+    }
 }
 
 public class TicketListDto
@@ -43,4 +49,13 @@ public class UserListDto
     public bool IsActive { get; set; }
     public IList<string> Roles { get; set; } = [];
     public DateTime CreatedAt { get; set; }
+}
+
+public class IntegrationListDto
+{
+    public Guid Id { get; set; }
+    public string Service { get; set; } = string.Empty;
+    public bool IsEnabled { get; set; }
+    public bool? IsHealthy { get; set; }
+    public DateTime? LastTestedAt { get; set; }
 }

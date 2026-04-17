@@ -1,6 +1,7 @@
 @inherits LayoutComponentBase
 @inject NavigationManager Navigation
 @inject IAuthService AuthService
+@inject LocalisationService L
 
 <MudThemeProvider Theme="_theme" />
 <MudPopoverProvider />
@@ -18,10 +19,32 @@
                                Color="Color.Default" Edge="Edge.Start"
                                OnClick="@ToggleDrawer" />
                 <MudText Typo="Typo.h6" Class="ml-1"
-                         Style="font-weight:700;color:#1565C0;">ChurchMS</MudText>
+                         Style="font-weight:700;color:#1565C0;">@L.T("app.name")</MudText>
                 <MudText Typo="Typo.body2" Class="ml-1"
-                         Style="color:rgba(0,0,0,0.38);font-weight:400;">Admin</MudText>
+                         Style="color:rgba(0,0,0,0.38);font-weight:400;">@L.T("app.admin")</MudText>
                 <MudSpacer />
+
+                @* ── Language Switcher ── *@
+                <MudMenu Dense="true" AnchorOrigin="Origin.BottomRight"
+                         TransformOrigin="Origin.TopRight">
+                    <ActivatorContent Context="langMenuCtx">
+                        <MudButton Variant="Variant.Text" Color="Color.Default"
+                                   StartIcon="@Icons.Material.Outlined.Translate"
+                                   Style="text-transform:none;font-weight:600;min-width:auto;">
+                            @L.CurrentLangLabel
+                        </MudButton>
+                    </ActivatorContent>
+                    <ChildContent>
+                        @foreach (var (code, label, flag) in LocalisationService.SupportedLanguages)
+                        {
+                            <MudMenuItem OnClick="@(() => SwitchLanguage(code))"
+                                         Style="@(code == L.CurrentLang ? "font-weight:700;background:rgba(21,101,192,0.08);" : "")">
+                                <span style="margin-right:8px;">@flag</span> @label
+                            </MudMenuItem>
+                        }
+                    </ChildContent>
+                </MudMenu>
+
                 <MudIconButton Icon="@Icons.Material.Outlined.Notifications"
                                Color="Color.Default" Class="mr-1" />
                 <MudMenu Dense="true" AnchorOrigin="Origin.BottomRight"
@@ -33,11 +56,11 @@
                         </MudAvatar>
                     </ActivatorContent>
                     <ChildContent>
-                        <MudMenuItem Icon="@Icons.Material.Outlined.Person">Profile</MudMenuItem>
-                        <MudMenuItem Icon="@Icons.Material.Outlined.Settings">Settings</MudMenuItem>
+                        <MudMenuItem Icon="@Icons.Material.Outlined.Person">@L.T("app.profile")</MudMenuItem>
+                        <MudMenuItem Icon="@Icons.Material.Outlined.Settings">@L.T("app.settings")</MudMenuItem>
                         <MudDivider />
                         <MudMenuItem Icon="@Icons.Material.Outlined.Logout"
-                                     OnClick="@Logout">Sign Out</MudMenuItem>
+                                     OnClick="@Logout">@L.T("app.signout")</MudMenuItem>
                     </ChildContent>
                 </MudMenu>
             </MudAppBar>
@@ -114,10 +137,17 @@
     {
         if (firstRender)
         {
+            await L.InitializeAsync();
+            L.OnLanguageChanged += () => InvokeAsync(StateHasChanged);
             _initialized = true;
             StateHasChanged();
         }
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private async Task SwitchLanguage(string langCode)
+    {
+        await L.SetLanguageAsync(langCode);
     }
 
     private static string GetUserName(System.Security.Claims.ClaimsPrincipal user)

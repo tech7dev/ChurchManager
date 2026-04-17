@@ -1,0 +1,87 @@
+@page "/families"
+@attribute [Authorize]
+@inject MemberService MemberService
+
+<PageTitle>Families — ChurchMS</PageTitle>
+
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(21,101,192,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.FamilyRestroom" Color="Color.Primary" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Families</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Manage family units and relationships
+            </MudText>
+        </div>
+    </div>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary"
+               StartIcon="@Icons.Material.Outlined.GroupAdd"
+               Style="border-radius:10px;">Add Family</MudButton>
+</div>
+
+<MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+    <MudTable ServerData="@ServerLoad" Dense="false" Hover="true" @ref="_table"
+              RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Primary"
+              Elevation="0">
+        <HeaderContent>
+            <MudTh Style="font-weight:600;">Name</MudTh>
+            <MudTh Style="font-weight:600;">Members</MudTh>
+            <MudTh Style="font-weight:600;">Notes</MudTh>
+            <MudTh Style="font-weight:600;">Created</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">
+                <MudText Style="font-weight:600;">@context.Name</MudText>
+            </MudTd>
+            <MudTd DataLabel="Members">
+                <MudChip T="string" Size="Size.Small" Color="Color.Primary"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.MemberCount
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Notes">
+                <MudText Typo="Typo.body2">@context.Notes</MudText>
+            </MudTd>
+            <MudTd DataLabel="Created">
+                <MudText Typo="Typo.body2">@context.CreatedAt.ToString("d")</MudText>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <div class="d-flex flex-column align-center pa-8 gap-2">
+                <MudIcon Icon="@Icons.Material.Outlined.FamilyRestroom"
+                         Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                <MudText Color="Color.Secondary">No families found.</MudText>
+            </div>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText Align="Align.Center" Class="pa-4" Color="Color.Secondary">Loading…</MudText>
+        </LoadingContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private MudTable<FamilyDto> _table = null!;
+    private bool _loading;
+
+    private async Task<TableData<FamilyDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await MemberService.GetFamiliesAsync(
+                state.Page + 1, state.PageSize);
+            return new TableData<FamilyDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+}

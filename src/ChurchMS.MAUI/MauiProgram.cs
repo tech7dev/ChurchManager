@@ -27,7 +27,7 @@ public static class MauiProgram
         // HTTP client pointing to the deployed API
         builder.Services.AddHttpClient("ChurchMSApi", client =>
         {
-            client.BaseAddress = new Uri("http://161.97.91.79:7006");
+            client.BaseAddress = new Uri("http://84.247.187.33:5009");
             client.DefaultRequestHeaders.Add("Accept", "application/json");
             client.Timeout = TimeSpan.FromSeconds(30);
         });

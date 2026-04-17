@@ -1,0 +1,104 @@
+@page "/notifications"
+@attribute [Authorize]
+@inject MessagingService MessagingService
+@inject ISnackbar Snackbar
+
+<PageTitle>Notifications — ChurchMS</PageTitle>
+
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(255,152,0,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.Notifications" Color="Color.Warning" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Notifications</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                System alerts and reminders
+            </MudText>
+        </div>
+    </div>
+</div>
+
+<MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+    <MudTable ServerData="@ServerLoad" Dense="false" Hover="true" @ref="_table"
+              RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Warning"
+              Elevation="0">
+        <HeaderContent>
+            <MudTh Style="font-weight:600;">Title</MudTh>
+            <MudTh Style="font-weight:600;">Body</MudTh>
+            <MudTh Style="font-weight:600;">Type</MudTh>
+            <MudTh Style="font-weight:600;">Date</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Title">
+                <div class="d-flex align-center gap-2">
+                    @if (!context.IsRead)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Circle"
+                                 Color="Color.Info" Size="Size.Small"
+                                 Style="font-size:0.6rem;" />
+                    }
+                    <MudText Typo="Typo.body2" Style="font-weight:600;">@context.Title</MudText>
+                </div>
+            </MudTd>
+            <MudTd DataLabel="Body">
+                <MudText Typo="Typo.body2">@Truncate(context.Body, 80)</MudText>
+            </MudTd>
+            <MudTd DataLabel="Type">
+                <MudChip T="string" Size="Size.Small"
+                         Color="@NotificationTypeColor(context.Type)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.Type
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Date">
+                <MudText Typo="Typo.body2">@context.CreatedAt.ToString("g")</MudText>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <div class="d-flex flex-column align-center pa-8 gap-2">
+                <MudIcon Icon="@Icons.Material.Outlined.Notifications"
+                         Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                <MudText Color="Color.Secondary">No notifications found.</MudText>
+            </div>
+        </NoRecordsContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private MudTable<NotificationListDto> _table = null!;
+    private bool _loading;
+
+    private async Task<TableData<NotificationListDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await MessagingService.GetNotificationsAsync(state.Page + 1, state.PageSize);
+            return new TableData<NotificationListDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+
+    private static Color NotificationTypeColor(string type) => type switch
+    {
+        "Info"         => Color.Info,
+        "Success"      => Color.Success,
+        "Warning"      => Color.Warning,
+        "Error"        => Color.Error,
+        "Reminder"     => Color.Secondary,
+        "Announcement" => Color.Primary,
+        _ => Color.Default
+    };
+
+    private static string Truncate(string text, int maxLength) =>
+        text.Length <= maxLength ? text : text[..maxLength] + "...";
+}

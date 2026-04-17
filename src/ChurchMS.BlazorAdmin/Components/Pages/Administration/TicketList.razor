@@ -1,0 +1,120 @@
+@page "/it-management/tickets"
+@attribute [Authorize]
+@inject ITManagementService ITManagementService
+
+<PageTitle>Support Tickets — ChurchMS</PageTitle>
+
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(211,47,47,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.SupportAgent" Color="Color.Error" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Support Tickets</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Track and resolve support requests
+            </MudText>
+        </div>
+    </div>
+</div>
+
+<MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+    <MudTable ServerData="@ServerLoad" Dense="false" Hover="true" @ref="_table"
+              RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Error"
+              Elevation="0">
+        <HeaderContent>
+            <MudTh Style="font-weight:600;">Title</MudTh>
+            <MudTh Style="font-weight:600;">Category</MudTh>
+            <MudTh Style="font-weight:600;">Priority</MudTh>
+            <MudTh Style="font-weight:600;">Status</MudTh>
+            <MudTh Style="font-weight:600;">Submitted By</MudTh>
+            <MudTh Style="font-weight:600;">Created</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Title">
+                <MudText Typo="Typo.body2" Style="font-weight:600;">@context.Title</MudText>
+            </MudTd>
+            <MudTd DataLabel="Category">
+                <MudChip T="string" Size="Size.Small" Color="Color.Default"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.Category
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Priority">
+                <MudChip T="string" Size="Size.Small"
+                         Color="@PriorityColor(context.Priority)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.Priority
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Size="Size.Small"
+                         Color="@TicketStatusColor(context.Status)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.Status
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Submitted By">
+                <MudText Typo="Typo.body2">@(context.SubmittedByName ?? "—")</MudText>
+            </MudTd>
+            <MudTd DataLabel="Created">
+                <MudText Typo="Typo.body2">@context.CreatedAt.ToString("d")</MudText>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <div class="d-flex flex-column align-center pa-8 gap-2">
+                <MudIcon Icon="@Icons.Material.Outlined.SupportAgent"
+                         Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                <MudText Color="Color.Secondary">No tickets found.</MudText>
+            </div>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText Align="Align.Center" Class="pa-4" Color="Color.Secondary">Loading…</MudText>
+        </LoadingContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private MudTable<TicketListDto> _table = null!;
+    private bool _loading;
+
+    private async Task<TableData<TicketListDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await ITManagementService.GetTicketsAsync(
+                state.Page + 1, state.PageSize);
+            return new TableData<TicketListDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+
+    private static Color PriorityColor(string priority) => priority switch
+    {
+        "Low" => Color.Default,
+        "Medium" => Color.Info,
+        "High" => Color.Warning,
+        "Critical" => Color.Error,
+        _ => Color.Default
+    };
+
+    private static Color TicketStatusColor(string status) => status switch
+    {
+        "Open" => Color.Info,
+        "InProgress" => Color.Warning,
+        "Resolved" => Color.Success,
+        "Closed" => Color.Dark,
+        _ => Color.Default
+    };
+}

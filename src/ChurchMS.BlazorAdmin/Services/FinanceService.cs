@@ -58,6 +58,20 @@ public class FinanceService(IHttpClientFactory httpClientFactory, IAuthService a
         return await ReadPagedAsync<ExpenseListItemDto>(
             await client.GetAsync($"api/v1/expenses?page={page}&pageSize={pageSize}"));
     }
+
+    // Budgets
+    public async Task<PagedResult<BudgetListDto>?> GetBudgetsAsync(int page = 1, int pageSize = 20)
+    {
+        var client = await GetClientAsync();
+        return await ReadPagedAsync<BudgetListDto>(await client.GetAsync($"api/v1/expenses/budgets?page={page}&pageSize={pageSize}"));
+    }
+
+    // Bank Accounts
+    public async Task<PagedResult<BankAccountDto>?> GetBankAccountsAsync(int page = 1, int pageSize = 20)
+    {
+        var client = await GetClientAsync();
+        return await ReadPagedAsync<BankAccountDto>(await client.GetAsync($"api/v1/accounting/bank-accounts?page={page}&pageSize={pageSize}"));
+    }
 }
 
 /// <summary>Local list DTO for expense display until Application DTOs are finalized.</summary>
@@ -71,4 +85,28 @@ public class ExpenseListItemDto
     public DateOnly ExpenseDate { get; set; }
     public string Status { get; set; } = string.Empty;
     public string? VendorName { get; set; }
+}
+
+public class BudgetListDto
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public int Year { get; set; }
+    public decimal TotalAmount { get; set; }
+    public string Currency { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
+    public DateOnly StartDate { get; set; }
+    public DateOnly EndDate { get; set; }
+}
+
+public class BankAccountDto
+{
+    public Guid Id { get; set; }
+    public string AccountName { get; set; } = string.Empty;
+    public string BankName { get; set; } = string.Empty;
+    public string AccountNumber { get; set; } = string.Empty;
+    public decimal CurrentBalance { get; set; }
+    public string Currency { get; set; } = string.Empty;
+    public bool IsActive { get; set; }
+    public bool IsDefault { get; set; }
 }

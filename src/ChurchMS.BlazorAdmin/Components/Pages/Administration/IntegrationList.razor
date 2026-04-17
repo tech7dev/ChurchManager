@@ -1,0 +1,96 @@
+@page "/it-management/integrations"
+@attribute [Authorize]
+@inject ITManagementService ITManagementService
+
+<PageTitle>Integrations — ChurchMS</PageTitle>
+
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(84,110,122,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.Extension" Color="Color.Secondary" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Integrations</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Configure external service connections
+            </MudText>
+        </div>
+    </div>
+</div>
+
+<MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+    <MudTable ServerData="@ServerLoad" Dense="false" Hover="true" @ref="_table"
+              RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Secondary"
+              Elevation="0">
+        <HeaderContent>
+            <MudTh Style="font-weight:600;">Service</MudTh>
+            <MudTh Style="font-weight:600;">Enabled</MudTh>
+            <MudTh Style="font-weight:600;">Health</MudTh>
+            <MudTh Style="font-weight:600;">Last Tested</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Service">
+                <MudText Typo="Typo.body2" Style="font-weight:600;">@context.Service</MudText>
+            </MudTd>
+            <MudTd DataLabel="Enabled">
+                <MudChip T="string" Size="Size.Small"
+                         Color="@(context.IsEnabled ? Color.Success : Color.Default)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @(context.IsEnabled ? "Enabled" : "Disabled")
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Health">
+                @if (context.IsHealthy == true)
+                {
+                    <MudIcon Icon="@Icons.Material.Outlined.CheckCircle" Color="Color.Success" Size="Size.Small" />
+                }
+                else if (context.IsHealthy == false)
+                {
+                    <MudIcon Icon="@Icons.Material.Outlined.Cancel" Color="Color.Error" Size="Size.Small" />
+                }
+                else
+                {
+                    <MudIcon Icon="@Icons.Material.Outlined.HelpOutline" Color="Color.Default" Size="Size.Small" />
+                }
+            </MudTd>
+            <MudTd DataLabel="Last Tested">
+                <MudText Typo="Typo.body2">@(context.LastTestedAt?.ToString("g") ?? "—")</MudText>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <div class="d-flex flex-column align-center pa-8 gap-2">
+                <MudIcon Icon="@Icons.Material.Outlined.Extension"
+                         Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                <MudText Color="Color.Secondary">No integrations configured.</MudText>
+            </div>
+        </NoRecordsContent>
+        <LoadingContent>
+            <MudText Align="Align.Center" Class="pa-4" Color="Color.Secondary">Loading…</MudText>
+        </LoadingContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private MudTable<IntegrationListDto> _table = null!;
+    private bool _loading;
+
+    private async Task<TableData<IntegrationListDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await ITManagementService.GetIntegrationsAsync(
+                state.Page + 1, state.PageSize);
+            return new TableData<IntegrationListDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+}

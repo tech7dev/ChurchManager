@@ -1,0 +1,104 @@
+@page "/messaging/campaigns"
+@attribute [Authorize]
+@inject MessagingService MessagingService
+@inject ISnackbar Snackbar
+
+<PageTitle>Message Campaigns — ChurchMS</PageTitle>
+
+<div class="cms-page-header">
+    <div class="cms-page-header-left">
+        <div class="cms-page-icon" style="background:rgba(1,87,155,0.1);">
+            <MudIcon Icon="@Icons.Material.Outlined.Campaign" Color="Color.Info" />
+        </div>
+        <div class="cms-page-title">
+            <MudText Typo="Typo.h5" Style="font-weight:700;line-height:1.2;">Message Campaigns</MudText>
+            <MudText Typo="Typo.caption" Color="Color.Secondary">
+                Send SMS, email, and WhatsApp campaigns
+            </MudText>
+        </div>
+    </div>
+</div>
+
+<MudPaper Elevation="1" Style="border-radius:12px;overflow:hidden;">
+    <MudTable ServerData="@ServerLoad" Dense="false" Hover="true" @ref="_table"
+              RowsPerPage="20" Loading="@_loading" LoadingProgressColor="Color.Info"
+              Elevation="0">
+        <HeaderContent>
+            <MudTh Style="font-weight:600;">Name</MudTh>
+            <MudTh Style="font-weight:600;">Channel</MudTh>
+            <MudTh Style="font-weight:600;">Status</MudTh>
+            <MudTh Style="font-weight:600;">Recipients</MudTh>
+            <MudTh Style="font-weight:600;">Sent At</MudTh>
+            <MudTh Style="font-weight:600;">Created</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd DataLabel="Name">
+                <MudText Typo="Typo.body2" Style="font-weight:600;">@context.Name</MudText>
+            </MudTd>
+            <MudTd DataLabel="Channel">
+                <MudChip T="string" Size="Size.Small"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.Channel
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Status">
+                <MudChip T="string" Size="Size.Small"
+                         Color="@CampaignStatusColor(context.Status)"
+                         Variant="Variant.Filled" Label="true"
+                         Style="border-radius:6px;">
+                    @context.Status
+                </MudChip>
+            </MudTd>
+            <MudTd DataLabel="Recipients">
+                <MudText Typo="Typo.body2">@context.RecipientCount</MudText>
+            </MudTd>
+            <MudTd DataLabel="Sent At">
+                <MudText Typo="Typo.body2">@(context.SentAt?.ToString("g") ?? "—")</MudText>
+            </MudTd>
+            <MudTd DataLabel="Created">
+                <MudText Typo="Typo.body2">@context.CreatedAt.ToString("g")</MudText>
+            </MudTd>
+        </RowTemplate>
+        <NoRecordsContent>
+            <div class="d-flex flex-column align-center pa-8 gap-2">
+                <MudIcon Icon="@Icons.Material.Outlined.Campaign"
+                         Style="font-size:3rem;color:rgba(0,0,0,0.2);" />
+                <MudText Color="Color.Secondary">No campaigns found.</MudText>
+            </div>
+        </NoRecordsContent>
+        <PagerContent>
+            <MudTablePager />
+        </PagerContent>
+    </MudTable>
+</MudPaper>
+
+@code {
+    private MudTable<MessageCampaignListDto> _table = null!;
+    private bool _loading;
+
+    private async Task<TableData<MessageCampaignListDto>> ServerLoad(TableState state, CancellationToken ct)
+    {
+        _loading = true;
+        try
+        {
+            var result = await MessagingService.GetCampaignsAsync(state.Page + 1, state.PageSize);
+            return new TableData<MessageCampaignListDto>
+            {
+                Items = result?.Items ?? [],
+                TotalItems = result?.TotalCount ?? 0
+            };
+        }
+        finally { _loading = false; }
+    }
+
+    private static Color CampaignStatusColor(string status) => status switch
+    {
+        "Draft"     => Color.Default,
+        "Scheduled" => Color.Info,
+        "Sending"   => Color.Warning,
+        "Sent"      => Color.Success,
+        "Cancelled" => Color.Error,
+        _ => Color.Default
+    };
+}

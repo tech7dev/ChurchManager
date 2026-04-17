@@ -20,6 +20,12 @@ public class MessagingService(IHttpClientFactory httpClientFactory, IAuthService
         return await ReadPagedAsync<AppointmentListDto>(
             await client.GetAsync($"api/v1/messaging/appointments?page={page}&pageSize={pageSize}"));
     }
+
+    public async Task<PagedResult<NotificationListDto>?> GetNotificationsAsync(int page = 1, int pageSize = 20)
+    {
+        var client = await GetClientAsync();
+        return await ReadPagedAsync<NotificationListDto>(await client.GetAsync($"api/v1/notifications?page={page}&pageSize={pageSize}"));
+    }
 }
 
 public class MessageCampaignListDto
@@ -41,4 +47,14 @@ public class AppointmentListDto
     public string? AssigneeName { get; set; }
     public DateTime? ScheduledAt { get; set; }
     public string Status { get; set; } = string.Empty;
+}
+
+public class NotificationListDto
+{
+    public Guid Id { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public string Body { get; set; } = string.Empty;
+    public string Type { get; set; } = string.Empty;
+    public bool IsRead { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
