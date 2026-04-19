@@ -34,7 +34,7 @@ public static class SuperAdminSeedData
             CreatedAt = DateTime.UtcNow
         };
 
-        var result = await userManager.CreateAsync(superAdmin, "Admin@ChurchMS123!");
+        var result = await userManager.CreateAsync(superAdmin, "Password@123");
         if (result.Succeeded)
         {
             await userManager.AddToRoleAsync(superAdmin, AppConstants.Roles.SuperAdmin);

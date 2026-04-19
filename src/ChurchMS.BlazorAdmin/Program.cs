@@ -1,9 +1,12 @@
 using ChurchMS.BlazorAdmin.Auth;
-using Fluxor;
 using ChurchMS.BlazorAdmin.Components;
 using ChurchMS.BlazorAdmin.Services;
+using ChurchMS.Shared.Constants;
+using Fluxor;
 using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor.Services;
+
+using Roles = ChurchMS.Shared.Constants.AppConstants.Roles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +23,34 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddAuthentication().AddCookie();
 builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddAuthorizationCore();
+builder.Services.AddAuthorizationCore(options =>
+{
+    // Policies mirror the API side so [Authorize(Policy = "...")] can be used interchangeably.
+    options.AddPolicy(AuthorizationPolicies.RequireSuperAdmin,
+        p => p.RequireRole(Roles.SuperAdmin));
+    options.AddPolicy(AuthorizationPolicies.RequireCentralAdmin,
+        p => p.RequireRole(Roles.SuperAdmin, Roles.CentralAdmin));
+    options.AddPolicy(AuthorizationPolicies.RequireChurchAdmin,
+        p => p.RequireRole(Roles.SuperAdmin, Roles.CentralAdmin, Roles.ChurchAdmin));
+    options.AddPolicy(AuthorizationPolicies.RequireITManager,
+        p => p.RequireRole(Roles.SuperAdmin, Roles.ChurchAdmin, Roles.ITManager));
+    options.AddPolicy(AuthorizationPolicies.RequireSecretary,
+        p => p.RequireRole(Roles.SuperAdmin, Roles.ChurchAdmin, Roles.Secretary));
+    options.AddPolicy(AuthorizationPolicies.RequireTreasurer,
+        p => p.RequireRole(Roles.SuperAdmin, Roles.ChurchAdmin, Roles.Treasurer));
+    options.AddPolicy(AuthorizationPolicies.RequireDepartmentHead,
+        p => p.RequireRole(Roles.SuperAdmin, Roles.ChurchAdmin, Roles.DepartmentHead));
+    options.AddPolicy(AuthorizationPolicies.RequireDepartmentTreasurer,
+        p => p.RequireRole(Roles.SuperAdmin, Roles.ChurchAdmin, Roles.Treasurer, Roles.DepartmentTreasurer));
+    options.AddPolicy(AuthorizationPolicies.RequireTeacher,
+        p => p.RequireRole(Roles.SuperAdmin, Roles.ChurchAdmin, Roles.Teacher));
+    options.AddPolicy(AuthorizationPolicies.RequireEvangelismLeader,
+        p => p.RequireRole(Roles.SuperAdmin, Roles.ChurchAdmin, Roles.EvangelismLeader));
+    options.AddPolicy(AuthorizationPolicies.RequireMultimediaManager,
+        p => p.RequireRole(Roles.SuperAdmin, Roles.ChurchAdmin, Roles.MultimediaManager));
+    options.AddPolicy(AuthorizationPolicies.RequireLogisticsManager,
+        p => p.RequireRole(Roles.SuperAdmin, Roles.ChurchAdmin, Roles.LogisticsManager));
+});
 builder.Services.AddScoped<JwtAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(
     sp => sp.GetRequiredService<JwtAuthenticationStateProvider>());

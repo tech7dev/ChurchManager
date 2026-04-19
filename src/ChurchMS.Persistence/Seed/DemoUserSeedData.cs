@@ -7,29 +7,50 @@ using Microsoft.Extensions.Logging;
 namespace ChurchMS.Persistence.Seed;
 
 /// <summary>
-/// Seeds demo users (one per role) for the parent church. Password for all: Password@123
+/// Seeds démonstration users (multiple per role, RDC theme).
+/// Password for all: Password@123
+/// GUIDs match scripts/seed-data.sql so idempotency is preserved across both seeding paths.
 /// </summary>
 public static class DemoUserSeedData
 {
     private static readonly Guid ParentChurchId = Guid.Parse("A0000001-0000-0000-0000-000000000001");
     private static readonly Guid ChildChurch1Id = Guid.Parse("A0000001-0000-0000-0000-000000000002");
+    private static readonly Guid ChildChurch2Id = Guid.Parse("A0000001-0000-0000-0000-000000000003");
 
     private static readonly (Guid Id, string Email, string FirstName, string LastName, string Role, Guid ChurchId)[] Users =
     [
-        (Guid.Parse("B0000001-0000-0000-0000-000000000001"), "central@eeg-grace.org",     "Éric",      "Nguéma",     AppConstants.Roles.CentralAdmin,       ParentChurchId),
-        (Guid.Parse("B0000001-0000-0000-0000-000000000002"), "admin.church@eeg-grace.org", "Hélène",    "Tchouameni", AppConstants.Roles.ChurchAdmin,         ParentChurchId),
-        (Guid.Parse("B0000001-0000-0000-0000-000000000003"), "it@eeg-grace.org",           "Célestin",  "Mbappé",     AppConstants.Roles.ITManager,           ParentChurchId),
-        (Guid.Parse("B0000001-0000-0000-0000-000000000004"), "secretariat@eeg-grace.org",  "Béatrice",  "Fotso",      AppConstants.Roles.Secretary,           ParentChurchId),
-        (Guid.Parse("B0000001-0000-0000-0000-000000000005"), "tresorier@eeg-grace.org",    "André",     "Kamga",      AppConstants.Roles.Treasurer,           ParentChurchId),
-        (Guid.Parse("B0000001-0000-0000-0000-000000000006"), "dept.head@eeg-grace.org",    "François",  "Nganou",     AppConstants.Roles.DepartmentHead,      ParentChurchId),
-        (Guid.Parse("B0000001-0000-0000-0000-000000000007"), "dept.tres@eeg-grace.org",    "Géraldine", "Tagne",      AppConstants.Roles.DepartmentTreasurer, ParentChurchId),
-        (Guid.Parse("B0000001-0000-0000-0000-000000000008"), "enseignant@eeg-grace.org",   "Théophile", "Nkoulou",    AppConstants.Roles.Teacher,             ParentChurchId),
-        (Guid.Parse("B0000001-0000-0000-0000-000000000009"), "evangelisme@eeg-grace.org",  "Moïse",     "Essomba",    AppConstants.Roles.EvangelismLeader,    ParentChurchId),
-        (Guid.Parse("B0000001-0000-0000-0000-00000000000A"), "multimedia@eeg-grace.org",   "Noël",      "Atangana",   AppConstants.Roles.MultimediaManager,   ParentChurchId),
-        (Guid.Parse("B0000001-0000-0000-0000-00000000000B"), "logistique@eeg-grace.org",   "Raphaël",   "Djomgang",   AppConstants.Roles.LogisticsManager,    ParentChurchId),
-        (Guid.Parse("B0000001-0000-0000-0000-00000000000C"), "membre1@eeg-grace.org",      "Joséphine", "Mbouda",     AppConstants.Roles.Member,              ParentChurchId),
-        (Guid.Parse("B0000001-0000-0000-0000-00000000000D"), "membre2@eeg-grace.org",      "Émmanuel",  "Tchinda",    AppConstants.Roles.Member,              ParentChurchId),
-        (Guid.Parse("B0000001-0000-0000-0000-00000000000E"), "membre3@eeg-grace.org",      "Élisabeth", "Nkwenti",    AppConstants.Roles.Member,              ChildChurch1Id),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000001"), "central1@eeg-grace.cd",     "Patrice",     "Tshilumba",    AppConstants.Roles.CentralAdmin,       ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000002"), "central2@eeg-grace.cd",     "Bénédicte",   "Kabongo",      AppConstants.Roles.CentralAdmin,       ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000003"), "admin.kin@eeg-grace.cd",    "Félicité",    "Mwamba",       AppConstants.Roles.ChurchAdmin,        ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000004"), "admin.lshi@eeg-grace.cd",   "André",       "Ilunga",       AppConstants.Roles.ChurchAdmin,        ChildChurch1Id),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000005"), "it1@eeg-grace.cd",          "Célestin",    "Mukendi",      AppConstants.Roles.ITManager,          ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000006"), "it2@eeg-grace.cd",          "Jérémie",     "Kasongo",      AppConstants.Roles.ITManager,          ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000007"), "secretariat1@eeg-grace.cd", "Béatrice",    "Tshibanda",    AppConstants.Roles.Secretary,          ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000008"), "secretariat2@eeg-grace.cd", "Thérèse",     "Kalonji",      AppConstants.Roles.Secretary,          ChildChurch1Id),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000009"), "tresorier1@eeg-grace.cd",   "Étienne",     "Mbuyi",        AppConstants.Roles.Treasurer,          ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-00000000000A"), "tresorier2@eeg-grace.cd",   "Clémentine",  "Ngoy",         AppConstants.Roles.Treasurer,          ChildChurch2Id),
+        (Guid.Parse("B0000001-0000-0000-0000-00000000000B"), "dept.head1@eeg-grace.cd",   "François",    "Kabila",       AppConstants.Roles.DepartmentHead,     ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-00000000000C"), "dept.head2@eeg-grace.cd",   "Gérard",      "Mulumba",      AppConstants.Roles.DepartmentHead,     ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-00000000000D"), "dept.head3@eeg-grace.cd",   "Marie-Josée", "Lumbala",      AppConstants.Roles.DepartmentHead,     ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-00000000000E"), "dept.tres1@eeg-grace.cd",   "Géraldine",   "Tshiamala",    AppConstants.Roles.DepartmentTreasurer, ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-00000000000F"), "dept.tres2@eeg-grace.cd",   "Cécile",      "Kayembe",      AppConstants.Roles.DepartmentTreasurer, ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000010"), "enseignant1@eeg-grace.cd",  "Théophile",   "Banza",        AppConstants.Roles.Teacher,            ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000011"), "enseignant2@eeg-grace.cd",  "Émilie",      "Mukoko",       AppConstants.Roles.Teacher,            ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000012"), "enseignant3@eeg-grace.cd",  "Noël",        "Kasumba",      AppConstants.Roles.Teacher,            ChildChurch1Id),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000013"), "evangelisme1@eeg-grace.cd", "Moïse",       "Tshisekedi",   AppConstants.Roles.EvangelismLeader,   ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000014"), "evangelisme2@eeg-grace.cd", "Daniel",      "Kankonde",     AppConstants.Roles.EvangelismLeader,   ChildChurch2Id),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000015"), "multimedia1@eeg-grace.cd",  "Raphaël",     "Bemba",        AppConstants.Roles.MultimediaManager,  ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000016"), "multimedia2@eeg-grace.cd",  "Stéphane",    "Lukusa",       AppConstants.Roles.MultimediaManager,  ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000017"), "logistique1@eeg-grace.cd",  "Éric",        "Lumumba",      AppConstants.Roles.LogisticsManager,   ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000018"), "logistique2@eeg-grace.cd",  "Joseph",      "Kasa-Vubu",    AppConstants.Roles.LogisticsManager,   ChildChurch1Id),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000019"), "membre1@eeg-grace.cd",      "Joséphine",   "Mbuyi",        AppConstants.Roles.Member,             ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-00000000001A"), "membre2@eeg-grace.cd",      "Emmanuel",    "Tshibola",     AppConstants.Roles.Member,             ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-00000000001B"), "membre3@eeg-grace.cd",      "Élisabeth",   "Ntumba",       AppConstants.Roles.Member,             ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-00000000001C"), "membre4@eeg-grace.cd",      "Bernadette",  "Mukeba",       AppConstants.Roles.Member,             ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-00000000001D"), "membre5@eeg-grace.cd",      "Frédéric",    "Mbombo",       AppConstants.Roles.Member,             ParentChurchId),
+        (Guid.Parse("B0000001-0000-0000-0000-00000000001E"), "membre6@eeg-grace.cd",      "Pascaline",   "Mutombo",      AppConstants.Roles.Member,             ChildChurch1Id),
+        (Guid.Parse("B0000001-0000-0000-0000-00000000001F"), "membre7@eeg-grace.cd",      "Véronique",   "Bilonda",      AppConstants.Roles.Member,             ChildChurch2Id),
+        (Guid.Parse("B0000001-0000-0000-0000-000000000020"), "membre8@eeg-grace.cd",      "Léopold",     "Mukwa",        AppConstants.Roles.Member,             ChildChurch2Id),
     ];
 
     public static async Task SeedDemoUsersAsync(IServiceProvider serviceProvider)

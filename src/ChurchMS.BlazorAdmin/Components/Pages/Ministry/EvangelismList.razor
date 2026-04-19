@@ -1,5 +1,5 @@
 @page "/evangelism"
-@attribute [Authorize]
+@attribute [Authorize(Roles = "SuperAdmin,CentralAdmin,ChurchAdmin,EvangelismLeader")]
 @inject MinistryService MinistryService
 @inject ISnackbar Snackbar
 

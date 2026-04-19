@@ -1,5 +1,5 @@
 @page "/subscriptions"
-@attribute [Authorize]
+@attribute [Authorize(Roles = "SuperAdmin,CentralAdmin,ChurchAdmin")]
 @inject SubscriptionService SubscriptionService
 
 <PageTitle>Subscription — ChurchMS</PageTitle>

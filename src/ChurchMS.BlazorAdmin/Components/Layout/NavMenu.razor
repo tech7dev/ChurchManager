@@ -6,92 +6,134 @@
     <MudNavLink Href="/" Match="NavLinkMatch.All"
                 Icon="@Icons.Material.Outlined.Dashboard">@L.T("nav.dashboard")</MudNavLink>
 
-    <div class="cms-nav-section-label">@L.T("nav.members")</div>
+    @* ──────────────── People ──────────────── *@
+    <AuthorizeView Roles="SuperAdmin,CentralAdmin,ChurchAdmin,Secretary">
+        <div class="cms-nav-section-label">@L.T("nav.members")</div>
 
-    <MudNavGroup Title="@L.T("nav.members")" Icon="@Icons.Material.Outlined.People" Expanded="false">
-        <MudNavLink Href="/members"
-                    Icon="@Icons.Material.Outlined.PersonSearch">@L.T("nav.members.all")</MudNavLink>
-        <MudNavLink Href="/visitors"
-                    Icon="@Icons.Material.Outlined.PersonAdd">@L.T("nav.visitors")</MudNavLink>
-        <MudNavLink Href="/families"
-                    Icon="@Icons.Material.Outlined.FamilyRestroom">@L.T("nav.families")</MudNavLink>
-    </MudNavGroup>
+        <MudNavGroup Title="@L.T("nav.members")" Icon="@Icons.Material.Outlined.People" Expanded="false">
+            <MudNavLink Href="/members"
+                        Icon="@Icons.Material.Outlined.PersonSearch">@L.T("nav.members.all")</MudNavLink>
+            <MudNavLink Href="/visitors"
+                        Icon="@Icons.Material.Outlined.PersonAdd">@L.T("nav.visitors")</MudNavLink>
+            <MudNavLink Href="/families"
+                        Icon="@Icons.Material.Outlined.FamilyRestroom">@L.T("nav.families")</MudNavLink>
+        </MudNavGroup>
+    </AuthorizeView>
 
-    <MudNavGroup Title="@L.T("nav.communication")" Icon="@Icons.Material.Outlined.Message" Expanded="false">
-        <MudNavLink Href="/messaging/campaigns"
-                    Icon="@Icons.Material.Outlined.Campaign">@L.T("nav.campaigns")</MudNavLink>
-        <MudNavLink Href="/messaging/appointments"
-                    Icon="@Icons.Material.Outlined.CalendarMonth">@L.T("nav.appointments")</MudNavLink>
-        <MudNavLink Href="/notifications"
-                    Icon="@Icons.Material.Outlined.Notifications">@L.T("nav.notifications")</MudNavLink>
-    </MudNavGroup>
+    @* ──────────────── Communication ──────────────── *@
+    <AuthorizeView Roles="SuperAdmin,CentralAdmin,ChurchAdmin,Secretary">
+        <MudNavGroup Title="@L.T("nav.communication")" Icon="@Icons.Material.Outlined.Message" Expanded="false">
+            <MudNavLink Href="/messaging/campaigns"
+                        Icon="@Icons.Material.Outlined.Campaign">@L.T("nav.campaigns")</MudNavLink>
+            <MudNavLink Href="/messaging/appointments"
+                        Icon="@Icons.Material.Outlined.CalendarMonth">@L.T("nav.appointments")</MudNavLink>
+            <MudNavLink Href="/notifications"
+                        Icon="@Icons.Material.Outlined.Notifications">@L.T("nav.notifications")</MudNavLink>
+        </MudNavGroup>
+    </AuthorizeView>
 
-    <div class="cms-nav-section-label">@L.T("nav.finance")</div>
+    @* ──────────────── Finance ──────────────── *@
+    <AuthorizeView Roles="SuperAdmin,CentralAdmin,ChurchAdmin,Treasurer,DepartmentTreasurer">
+        <div class="cms-nav-section-label">@L.T("nav.finance")</div>
 
-    <MudNavGroup Title="@L.T("nav.finance")" Icon="@Icons.Material.Outlined.AccountBalance" Expanded="false">
-        <MudNavLink Href="/contributions"
-                    Icon="@Icons.Material.Outlined.Payments">@L.T("nav.contributions")</MudNavLink>
-        <MudNavLink Href="/expenses"
-                    Icon="@Icons.Material.Outlined.Receipt">@L.T("nav.expenses")</MudNavLink>
-        <MudNavLink Href="/funds"
-                    Icon="@Icons.Material.Outlined.Savings">@L.T("nav.funds")</MudNavLink>
-        <MudNavLink Href="/campaigns"
-                    Icon="@Icons.Material.Outlined.Flag">@L.T("nav.contrib.campaigns")</MudNavLink>
-        <MudNavLink Href="/budgets"
-                    Icon="@Icons.Material.Outlined.AccountBalanceWallet">@L.T("nav.budgets")</MudNavLink>
-    </MudNavGroup>
+        <MudNavGroup Title="@L.T("nav.finance")" Icon="@Icons.Material.Outlined.AccountBalance" Expanded="false">
+            <MudNavLink Href="/contributions"
+                        Icon="@Icons.Material.Outlined.Payments">@L.T("nav.contributions")</MudNavLink>
+            <MudNavLink Href="/expenses"
+                        Icon="@Icons.Material.Outlined.Receipt">@L.T("nav.expenses")</MudNavLink>
+            <MudNavLink Href="/funds"
+                        Icon="@Icons.Material.Outlined.Savings">@L.T("nav.funds")</MudNavLink>
+            <MudNavLink Href="/campaigns"
+                        Icon="@Icons.Material.Outlined.Flag">@L.T("nav.contrib.campaigns")</MudNavLink>
+            <MudNavLink Href="/budgets"
+                        Icon="@Icons.Material.Outlined.AccountBalanceWallet">@L.T("nav.budgets")</MudNavLink>
+        </MudNavGroup>
+    </AuthorizeView>
 
-    <div class="cms-nav-section-label">@L.T("nav.ministry")</div>
+    @* ──────────────── Ministry ──────────────── *@
+    <AuthorizeView Roles="SuperAdmin,CentralAdmin,ChurchAdmin,Secretary,Teacher,DepartmentHead,EvangelismLeader,MultimediaManager,LogisticsManager">
+        <div class="cms-nav-section-label">@L.T("nav.ministry")</div>
+    </AuthorizeView>
 
-    <MudNavGroup Title="@L.T("nav.events")" Icon="@Icons.Material.Outlined.Event" Expanded="false">
-        <MudNavLink Href="/events"
-                    Icon="@Icons.Material.Outlined.EventNote">@L.T("nav.events.all")</MudNavLink>
-        <MudNavLink Href="/attendance"
-                    Icon="@Icons.Material.Outlined.HowToReg">@L.T("nav.attendance")</MudNavLink>
-    </MudNavGroup>
+    <AuthorizeView Roles="SuperAdmin,CentralAdmin,ChurchAdmin,Secretary">
+        <MudNavGroup Title="@L.T("nav.events")" Icon="@Icons.Material.Outlined.Event" Expanded="false">
+            <MudNavLink Href="/events"
+                        Icon="@Icons.Material.Outlined.EventNote">@L.T("nav.events.all")</MudNavLink>
+            <MudNavLink Href="/attendance"
+                        Icon="@Icons.Material.Outlined.HowToReg">@L.T("nav.attendance")</MudNavLink>
+        </MudNavGroup>
+    </AuthorizeView>
 
-    <MudNavGroup Title="@L.T("nav.education")" Icon="@Icons.Material.Outlined.School" Expanded="false">
-        <MudNavLink Href="/sunday-school"
-                    Icon="@Icons.Material.Outlined.MenuBook">@L.T("nav.sundayschool")</MudNavLink>
-        <MudNavLink Href="/growth-school"
-                    Icon="@Icons.Material.Outlined.AutoStories">@L.T("nav.growthschool")</MudNavLink>
-    </MudNavGroup>
+    <AuthorizeView Roles="SuperAdmin,CentralAdmin,ChurchAdmin,Teacher">
+        <MudNavGroup Title="@L.T("nav.education")" Icon="@Icons.Material.Outlined.School" Expanded="false">
+            <MudNavLink Href="/sunday-school"
+                        Icon="@Icons.Material.Outlined.MenuBook">@L.T("nav.sundayschool")</MudNavLink>
+            <MudNavLink Href="/growth-school"
+                        Icon="@Icons.Material.Outlined.AutoStories">@L.T("nav.growthschool")</MudNavLink>
+        </MudNavGroup>
+    </AuthorizeView>
 
-    <MudNavLink Href="/departments"
-                Icon="@Icons.Material.Outlined.Groups">@L.T("nav.departments")</MudNavLink>
-    <MudNavLink Href="/evangelism"
-                Icon="@Icons.Material.Outlined.Public">@L.T("nav.evangelism")</MudNavLink>
-    <MudNavLink Href="/secretariat"
-                Icon="@Icons.Material.Outlined.Description">@L.T("nav.secretariat")</MudNavLink>
-    <MudNavLink Href="/multimedia"
-                Icon="@Icons.Material.Outlined.VideoLibrary">@L.T("nav.multimedia")</MudNavLink>
-    <MudNavLink Href="/logistics"
-                Icon="@Icons.Material.Outlined.LocalShipping">@L.T("nav.logistics")</MudNavLink>
+    <AuthorizeView Roles="SuperAdmin,CentralAdmin,ChurchAdmin,DepartmentHead">
+        <MudNavLink Href="/departments"
+                    Icon="@Icons.Material.Outlined.Groups">@L.T("nav.departments")</MudNavLink>
+    </AuthorizeView>
+    <AuthorizeView Roles="SuperAdmin,CentralAdmin,ChurchAdmin,EvangelismLeader">
+        <MudNavLink Href="/evangelism"
+                    Icon="@Icons.Material.Outlined.Public">@L.T("nav.evangelism")</MudNavLink>
+    </AuthorizeView>
+    <AuthorizeView Roles="SuperAdmin,CentralAdmin,ChurchAdmin,Secretary">
+        <MudNavLink Href="/secretariat"
+                    Icon="@Icons.Material.Outlined.Description">@L.T("nav.secretariat")</MudNavLink>
+    </AuthorizeView>
+    <AuthorizeView Roles="SuperAdmin,CentralAdmin,ChurchAdmin,MultimediaManager">
+        <MudNavLink Href="/multimedia"
+                    Icon="@Icons.Material.Outlined.VideoLibrary">@L.T("nav.multimedia")</MudNavLink>
+    </AuthorizeView>
+    <AuthorizeView Roles="SuperAdmin,CentralAdmin,ChurchAdmin,LogisticsManager">
+        <MudNavLink Href="/logistics"
+                    Icon="@Icons.Material.Outlined.LocalShipping">@L.T("nav.logistics")</MudNavLink>
+    </AuthorizeView>
 
-    <div class="cms-nav-section-label">@L.T("nav.reports")</div>
+    @* ──────────────── Reports ──────────────── *@
+    <AuthorizeView Roles="SuperAdmin,CentralAdmin,ChurchAdmin,Secretary,Treasurer,Teacher">
+        <div class="cms-nav-section-label">@L.T("nav.reports")</div>
 
-    <MudNavGroup Title="@L.T("nav.reports")" Icon="@Icons.Material.Outlined.BarChart" Expanded="false">
-        <MudNavLink Href="/reports/financial"
-                    Icon="@Icons.Material.Outlined.AttachMoney">@L.T("nav.reports.financial")</MudNavLink>
-        <MudNavLink Href="/reports/members"
-                    Icon="@Icons.Material.Outlined.PeopleAlt">@L.T("nav.reports.members")</MudNavLink>
-        <MudNavLink Href="/reports/attendance"
-                    Icon="@Icons.Material.Outlined.Analytics">@L.T("nav.reports.attendance")</MudNavLink>
-    </MudNavGroup>
+        <MudNavGroup Title="@L.T("nav.reports")" Icon="@Icons.Material.Outlined.BarChart" Expanded="false">
+            <AuthorizeView Roles="SuperAdmin,CentralAdmin,ChurchAdmin,Treasurer" Context="finCtx">
+                <MudNavLink Href="/reports/financial"
+                            Icon="@Icons.Material.Outlined.AttachMoney">@L.T("nav.reports.financial")</MudNavLink>
+            </AuthorizeView>
+            <AuthorizeView Roles="SuperAdmin,CentralAdmin,ChurchAdmin,Secretary" Context="memCtx">
+                <MudNavLink Href="/reports/members"
+                            Icon="@Icons.Material.Outlined.PeopleAlt">@L.T("nav.reports.members")</MudNavLink>
+            </AuthorizeView>
+            <AuthorizeView Roles="SuperAdmin,CentralAdmin,ChurchAdmin,Secretary,Teacher" Context="attCtx">
+                <MudNavLink Href="/reports/attendance"
+                            Icon="@Icons.Material.Outlined.Analytics">@L.T("nav.reports.attendance")</MudNavLink>
+            </AuthorizeView>
+        </MudNavGroup>
+    </AuthorizeView>
 
-    <div class="cms-nav-section-label">@L.T("nav.administration")</div>
+    @* ──────────────── Administration ──────────────── *@
+    <AuthorizeView Roles="SuperAdmin,CentralAdmin,ChurchAdmin,ITManager">
+        <div class="cms-nav-section-label">@L.T("nav.administration")</div>
 
-    <MudNavGroup Title="@L.T("nav.administration")" Icon="@Icons.Material.Outlined.AdminPanelSettings"
-                 Expanded="false">
-        <MudNavLink Href="/subscriptions"
-                    Icon="@Icons.Material.Outlined.CreditCard">@L.T("nav.subscription")</MudNavLink>
-        <MudNavLink Href="/it-management/users"
-                    Icon="@Icons.Material.Outlined.ManageAccounts">@L.T("nav.users")</MudNavLink>
-        <MudNavLink Href="/it-management/tickets"
-                    Icon="@Icons.Material.Outlined.ConfirmationNumber">@L.T("nav.tickets")</MudNavLink>
-        <MudNavLink Href="/it-management/integrations"
-                    Icon="@Icons.Material.Outlined.IntegrationInstructions">@L.T("nav.integrations")</MudNavLink>
-    </MudNavGroup>
+        <MudNavGroup Title="@L.T("nav.administration")" Icon="@Icons.Material.Outlined.AdminPanelSettings"
+                     Expanded="false">
+            <AuthorizeView Roles="SuperAdmin,CentralAdmin,ChurchAdmin" Context="subCtx">
+                <MudNavLink Href="/subscriptions"
+                            Icon="@Icons.Material.Outlined.CreditCard">@L.T("nav.subscription")</MudNavLink>
+            </AuthorizeView>
+            <AuthorizeView Roles="SuperAdmin,ChurchAdmin,ITManager" Context="itCtx">
+                <MudNavLink Href="/it-management/users"
+                            Icon="@Icons.Material.Outlined.ManageAccounts">@L.T("nav.users")</MudNavLink>
+                <MudNavLink Href="/it-management/tickets"
+                            Icon="@Icons.Material.Outlined.ConfirmationNumber">@L.T("nav.tickets")</MudNavLink>
+                <MudNavLink Href="/it-management/integrations"
+                            Icon="@Icons.Material.Outlined.IntegrationInstructions">@L.T("nav.integrations")</MudNavLink>
+            </AuthorizeView>
+        </MudNavGroup>
+    </AuthorizeView>
 
 </MudNavMenu>
 

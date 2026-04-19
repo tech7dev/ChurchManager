@@ -1,5 +1,5 @@
 @page "/reports/attendance"
-@attribute [Authorize]
+@attribute [Authorize(Roles = "SuperAdmin,CentralAdmin,ChurchAdmin,Secretary,Teacher")]
 @inject ReportService ReportService
 @inject ISnackbar Snackbar
 

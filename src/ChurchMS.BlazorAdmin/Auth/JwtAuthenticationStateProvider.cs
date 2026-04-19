@@ -64,8 +64,16 @@ public class JwtAuthenticationStateProvider(ProtectedLocalStorage localStorage)
             if (!handler.CanReadToken(token)) return null;
             var jwt = handler.ReadJwtToken(token);
             if (jwt.ValidTo < DateTime.UtcNow) return null;
+
+            // JwtSecurityTokenHandler's OutboundClaimTypeMap maps ClaimTypes.Role -> "role" during
+            // token creation, so role claims arrive with Type="role". Pass roleClaimType="role"
+            // (instead of the ClaimTypes.Role URI default) so User.IsInRole / [Authorize(Roles=...)] work.
             var claims = jwt.Claims.ToList();
-            var identity = new ClaimsIdentity(claims, "jwt");
+            var identity = new ClaimsIdentity(
+                claims,
+                authenticationType: "jwt",
+                nameType: ClaimTypes.Name,
+                roleType: "role");
             return new ClaimsPrincipal(identity);
         }
         catch { return null; }
